@@ -82,8 +82,6 @@ const AddFarm = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 							name="status"
 							type="select"
 							options={farmStatus}
-							// description="Select the farmer's status"
-							// placeholder="kenya"
 						/>
 
 						<DialogFooter className="flex items-center justify-end gap-4 pt-4">

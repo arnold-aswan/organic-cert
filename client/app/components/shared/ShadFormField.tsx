@@ -20,7 +20,7 @@ import {
 type ShadFormFieldProps = {
 	label: string;
 	name: string;
-	type: "text" | "email" | "textarea" | "select" | "tel" | "number";
+	type: "text" | "email" | "textarea" | "select" | "tel" | "number" | "date";
 	placeholder?: string;
 	options?: { label: string; value: string }[];
 	description?: string;
@@ -42,14 +42,15 @@ const ShadFormField = ({
 			name={name}
 			render={({ field }) => (
 				<FormItem>
-					<FormLabel>{label}</FormLabel>
+					<FormLabel className="capitalize">{label}</FormLabel>
 					<FormControl>
 						{type === "textarea" ? (
 							<Textarea
 								{...field}
 								id={name}
 								placeholder={placeholder}
-								rows={5}
+								className="bg-gray-100 flex flex-col w-full min-h-28"
+								rows={6}
 							/>
 						) : type === "select" ? (
 							<Select

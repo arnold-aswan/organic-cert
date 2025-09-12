@@ -22,7 +22,7 @@ const AddFarmer = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 			fullname: "",
 			email: "",
 			phone: "",
-			country: "",
+			county: "",
 			status: "active",
 		},
 	});
@@ -70,8 +70,8 @@ const AddFarmer = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 						/>
 
 						<ShadFormField
-							label="country"
-							name="country"
+							label="county"
+							name="county"
 							type="text"
 							placeholder="kenya"
 						/>
