@@ -7,11 +7,11 @@ import { Outlet } from "react-router";
 const DashboardLayout = () => {
 	return (
 		<SidebarProvider>
-			<div className="flex min-h-screen">
+			<div className="flex min-h-screen w-full">
 				<AppSidebar />
 				<div className="flex flex-col flex-1">
 					<Header />
-					<main className="p-4">
+					<main className="p-4 w-full max-w-7xl">
 						<Outlet />
 					</main>
 				</div>
