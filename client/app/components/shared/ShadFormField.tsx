@@ -20,10 +20,10 @@ import {
 type ShadFormFieldProps = {
 	label: string;
 	name: string;
-	type: string;
+	type: "text" | "email" | "textarea" | "select" | "tel" | "number";
 	placeholder?: string;
-	options?: any;
-  description?: string;
+	options?: { label: string; value: string }[];
+	description?: string;
 };
 
 const ShadFormField = ({
@@ -32,7 +32,7 @@ const ShadFormField = ({
 	type,
 	placeholder,
 	options,
-  description,
+	description,
 }: ShadFormFieldProps) => {
 	const form = useFormContext();
 
@@ -61,12 +61,12 @@ const ShadFormField = ({
 									<SelectValue placeholder={placeholder} />
 								</SelectTrigger>
 								<SelectContent>
-									{options?.map((option: string) => (
+									{options?.map((option) => (
 										<SelectItem
-											key={option}
-											value={option}
+											key={option.value}
+											value={option.value}
 										>
-											{option}
+											{option.label}
 										</SelectItem>
 									))}
 								</SelectContent>
