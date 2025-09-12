@@ -2,6 +2,35 @@ import { z } from "zod";
 
 const KENYA_PHONE_REGEX = /^(?:\+254|0)?7\d{8}$/;
 
+export const complianceQuestions = [
+	{
+		key: "q1",
+		label: "Any synthetic inputs in the last 36 months?",
+		description: 'Should be "No" for organic certification',
+	},
+	{
+		key: "q2",
+		label: "Adequate buffer zones?",
+		description: "Required to prevent contamination from non-organic sources",
+	},
+	{
+		key: "q3",
+		label: "Organic seed or permitted exceptions?",
+		description:
+			"Organic seeds must be used when available, exceptions allowed if not available",
+	},
+	{
+		key: "q4",
+		label: "Compost/soil fertility managed organically?",
+		description: "Only approved organic methods",
+	},
+	{
+		key: "q5",
+		label: "Record keeping/logs available?",
+		description: "Complete records required for certification",
+	},
+] as const;
+
 export const addFarmerSchema = z.object({
 	fullname: z
 		.string()
@@ -12,15 +41,13 @@ export const addFarmerSchema = z.object({
 	phone: z.string().regex(KENYA_PHONE_REGEX, {
 		message: "Phone must be a valid E.164 number (e.g. +2547XXXXXXXX)",
 	}),
-	country: z
+	county: z
 		.string()
-		.min(3, { message: "Country is required" })
-		.max(56, { message: "Country name is too long" })
+		.min(3, { message: "County is required" })
+		.max(56, { message: "County name is too long" })
 		.trim(),
 	status: z.enum(["active", "inactive"]),
 });
-
-export type AddFarmerSchema = z.infer<typeof addFarmerSchema>;
 
 export const addFarmSchema = z.object({
 	farmName: z
@@ -34,8 +61,6 @@ export const addFarmSchema = z.object({
 	status: z.enum(["active", "pending review", "inactive"]),
 });
 
-export type AddFarmSchema = z.infer<typeof addFarmSchema>;
-
 export const addFieldSchema = z.object({
 	fieldName: z
 		.string()
@@ -48,4 +73,40 @@ export const addFieldSchema = z.object({
 	status: z.enum(["planted", "growing", "harvested", "fallow"]),
 });
 
+export const inspectionSchema = z.object({
+	farmId: z.string().min(1, { message: "Farm ID is required" }).trim(),
+	inspectionDate: z.string().refine(
+		(val) => {
+			const date = new Date(val);
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+			return date >= today;
+		},
+		{
+			message: "Inspection date cannot be in the past",
+		}
+	),
+	inspectorName: z
+		.string()
+		.min(3, { message: "Inspector name is required" })
+		.max(50, { message: "Inspector name is too long" })
+		.trim(),
+	findings: z
+		.string()
+		.max(1000, { message: "Findings are too long" })
+		.trim()
+		.optional(),
+	status: z.enum(["passed", "failed", "pending"]),
+	compliance: z.object({
+		q1: z.boolean(),
+		q2: z.boolean(),
+		q3: z.boolean(),
+		q4: z.boolean(),
+		q5: z.boolean(),
+	}),
+});
+
+export type AddFarmerSchema = z.infer<typeof addFarmerSchema>;
+export type AddFarmSchema = z.infer<typeof addFarmSchema>;
 export type AddFieldSchema = z.infer<typeof addFieldSchema>;
+export type InspectionSchema = z.infer<typeof inspectionSchema>;
