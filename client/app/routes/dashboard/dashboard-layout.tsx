@@ -1,7 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/layout/AppSidebar";
 import Header from "@/components/layout/Header";
-import React from "react";
 import { Outlet } from "react-router";
 
 const DashboardLayout = () => {
@@ -11,7 +10,7 @@ const DashboardLayout = () => {
 				<AppSidebar />
 				<div className="flex flex-col flex-1">
 					<Header />
-					<main className="p-4 w-full max-w-7xl">
+					<main className="p-4 w-full xl:max-w-5xl">
 						<Outlet />
 					</main>
 				</div>
