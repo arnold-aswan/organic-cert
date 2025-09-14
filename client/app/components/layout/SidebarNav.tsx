@@ -6,6 +6,7 @@ import {
 	Trees,
 	Users,
 	Wheat,
+	UserPlus,
 } from "@/assets/icons";
 import { type LucideIcon } from "lucide-react";
 import { useLocation, useNavigate } from "react-router";
@@ -29,6 +30,7 @@ const SidebarNav = ({ isOpen }: { isOpen: boolean }) => {
 		{ label: "Fields", to: "/fields", icon: Wheat },
 		{ label: "Inspections", to: "/inspections", icon: ClipboardCheck },
 		{ label: "Certificates", to: "/certificates", icon: Award },
+		{ label: "Agronomists", to: "/agronomists", icon: UserPlus },
 	];
 
 	return (
