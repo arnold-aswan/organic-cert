@@ -138,4 +138,8 @@ body {
 	.modal-close-btn {
 		@apply hover:bg-green-900/10 hover:text-green-800 hover:border-none;
 	}
+
+	.table-head {
+		@apply text-muted-foreground font-semibold;
+	}
 }

@@ -6,4 +6,11 @@ export {
 	ClipboardCheck,
 	Award,
 	PlusCircle,
+	UserPlus,
+	ClipboardClock,
+	ClipboardList,
+	ChartPie,
+	SquarePen,
+	Download,
+	Trash2,
 } from "lucide-react";
