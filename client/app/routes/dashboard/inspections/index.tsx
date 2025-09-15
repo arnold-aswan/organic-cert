@@ -6,6 +6,7 @@ import {
 	ClipboardClock,
 	ClipboardList,
 	PlusCircle,
+	SquarePen,
 } from "@/assets/icons";
 import Inspection from "@/components/modals/inspections/Inspection";
 import AnalyticsCard from "@/components/cards/shared/AnalyticsCard";
@@ -130,9 +131,9 @@ const Inspections = () => {
 										<TableCell>
 											<Button
 												size="sm"
-												variant="outline"
+												className="bg-transparent text-black modal-close-btn"
 											>
-												View
+												<SquarePen />
 											</Button>
 										</TableCell>
 									</TableRow>

@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "@/assets/icons";
-import AddFarmer from "@/components/modals/farmers/AddFarmer";
 import AddFarm from "@/components/modals/farms/AddFarm";
 
 const Farms = () => {
 	const [isOpen, setIsOpen] = useState(false);
+	const [isEditing, setIsEditing] = useState(false);
 
 	return (
 		<section className="space-y-6">
-			<div className="flex items-center justify-between ">
+			<div className="flex flex-col items-start gap-3 xl:flex-row xl:items-center xl:justify-between ">
 				<div>
 					<h3 className="font-bold text-lg md:text-xl">Farms</h3>
 					<span className="text-muted-foreground text-sm">
@@ -28,6 +28,7 @@ const Farms = () => {
 				<AddFarm
 					isOpen={isOpen}
 					setIsOpen={setIsOpen}
+					isEditing={isEditing}
 				/>
 			</div>
 		</section>

@@ -7,7 +7,7 @@ const Fields = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	return (
 		<section className="space-y-6">
-			<div className="flex items-center justify-between ">
+			<div className="flex flex-col items-start gap-3 xl:flex-row xl:items-center xl:justify-between ">
 				<div>
 					<h3 className="font-bold text-lg md:text-xl">Fields</h3>
 					<span className="text-muted-foreground text-sm">

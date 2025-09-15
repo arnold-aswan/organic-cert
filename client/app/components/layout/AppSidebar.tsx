@@ -9,6 +9,7 @@ import {
 	useSidebar,
 } from "@/components/ui/sidebar";
 import SidebarNav from "./SidebarNav";
+import { Sprout } from "@/assets/icons";
 
 const AppSidebar = () => {
 	const { open } = useSidebar();
@@ -16,8 +17,8 @@ const AppSidebar = () => {
 	return (
 		<Sidebar collapsible="icon">
 			<SidebarHeader className="flex flex-row items-center gap-3">
-				<div className="bg-green-500 rounded-xl w-fit p-1">
-					<p className="text-white font-bold text-xl ">AO</p>
+				<div className="bg-green-500 rounded-md w-fit p-1">
+					<Sprout color={"white"} />
 				</div>
 				{open && (
 					<p className="font-bold text-2xl text-green-500">Agro-Organic</p>

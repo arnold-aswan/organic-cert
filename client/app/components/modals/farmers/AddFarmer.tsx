@@ -8,14 +8,13 @@ import {
 	Dialog,
 	DialogClose,
 	DialogContent,
-	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
 import type { AddEntityModalProps } from "@/types/types";
 
-const AddFarmer = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
+const AddFarmer = ({ isOpen, setIsOpen, isEditing }: AddEntityModalProps) => {
 	const form = useForm<AddFarmerSchema>({
 		resolver: zodResolver(addFarmerSchema),
 		defaultValues: {
@@ -32,7 +31,19 @@ const AddFarmer = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 		{ label: "Inactive", value: "inactive" },
 	];
 
-	const onSubmit = () => {};
+	const onSubmit = () => {
+		if (isEditing) {
+			// Update existing farmer
+			// await updateFarmer(farmerId, formData);
+		} else {
+			// Add new farmer
+			// await createFarmer(formData);
+		}
+
+		// Optionally close dialog and reset form
+		// onClose();
+		// resetForm();
+	};
 
 	return (
 		<Dialog
@@ -41,7 +52,7 @@ const AddFarmer = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 		>
 			<DialogContent className="sm:max-w-[540px]">
 				<DialogHeader>
-					<DialogTitle>Add Farmer</DialogTitle>
+					<DialogTitle>{isEditing ? "Edit Farmer" : "Add Farmer"} </DialogTitle>
 				</DialogHeader>
 				<Form {...form}>
 					<form
@@ -96,7 +107,7 @@ const AddFarmer = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 								type="submit"
 								className="bg-green-500 text-white"
 							>
-								Add Farmer
+								{isEditing ? "Save Changes" : "Add Farmer"}
 							</Button>
 						</DialogFooter>
 					</form>

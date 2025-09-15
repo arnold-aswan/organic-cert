@@ -15,7 +15,7 @@ import type { AddEntityModalProps } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-const AddFarm = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
+const AddFarm = ({ isOpen, setIsOpen, isEditing }: AddEntityModalProps) => {
 	const form = useForm<AddFarmSchema>({
 		resolver: zodResolver(addFarmSchema),
 		defaultValues: {

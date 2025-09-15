@@ -13,4 +13,5 @@ export {
 	SquarePen,
 	Download,
 	Trash2,
+	Sprout,
 } from "lucide-react";
