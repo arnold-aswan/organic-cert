@@ -8,6 +8,15 @@ export type InspectionEntry = {
 	status: "passed" | "failed" | "pending";
 };
 
+export type Farmer = {
+	id: string;
+	fullname: string;
+	email: string;
+	phone: string;
+	county: string;
+	status: "active" | "inactive";
+};
+
 export const inspectionData: InspectionEntry[] = [
 	{
 		id: "1",
@@ -71,5 +80,40 @@ export const inspectionData: InspectionEntry[] = [
 		inspector: "Grace Lewis",
 		complianceScore: 77,
 		status: "pending",
+	},
+];
+
+export const farmers: Farmer[] = [
+	{
+		id: "1",
+		fullname: "John Doe",
+		email: "johndoe@example.com",
+		phone: "+254712345678",
+		county: "Nairobi",
+		status: "active",
+	},
+	{
+		id: "2",
+		fullname: "Mary Wambui",
+		email: "mary.wambui@example.com",
+		phone: "+254711223344",
+		county: "Kiambu",
+		status: "inactive",
+	},
+	{
+		id: "3",
+		fullname: "Peter Otieno",
+		email: "peter.otieno@example.com",
+		phone: "+254733445566",
+		county: "Kisumu",
+		status: "active",
+	},
+	{
+		id: "4",
+		fullname: "Grace Njeri",
+		email: "grace.njeri@example.com",
+		phone: "+254701112233",
+		county: "Mombasa",
+		status: "active",
 	},
 ];
