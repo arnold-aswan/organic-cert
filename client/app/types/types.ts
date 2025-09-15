@@ -3,6 +3,7 @@ import type { LucideIcon } from "lucide-react";
 export interface AddEntityModalProps {
 	isOpen: boolean;
 	setIsOpen: (open: boolean) => void;
+	isEditing?: boolean;
 }
 
 export interface DashAnalyticsCardProps {

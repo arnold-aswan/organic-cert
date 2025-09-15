@@ -38,3 +38,11 @@ export const complianceColor = (score: number) => {
 		return "text-red-600";
 	}
 };
+
+export const statusColor = (status: string): string => {
+	if (status.toLowerCase() === "active") {
+		return "bg-green-600 text-white";
+	} else {
+		return "bg-gray-300 text-black";
+	}
+};
