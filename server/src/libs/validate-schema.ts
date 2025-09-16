@@ -72,6 +72,38 @@ const getFarmsSchema = z.object({
 	}),
 });
 
+// FIELD SCHEMA
+const fieldBodySchema = z.object({
+	name: z
+		.string()
+		.min(3, { message: "Field name is required" })
+		.max(50, { message: "Field name is too long" })
+		.trim(),
+	farmId: z.string().min(1, { message: "Farm ID is required" }).trim(),
+	crop: z.string().min(3, { message: "Crop is required" }).trim(),
+	area: z.number().min(1, { message: "Area must be at least 1 Ha" }),
+	status: z.enum(["planted", "growing", "harvested", "fallow"]),
+});
+
+const fieldSchema = z.object({
+	body: fieldBodySchema,
+});
+
+const updateFieldSchema = z.object({
+	body: fieldBodySchema,
+	params: z.object({ fieldId: z.string() }),
+});
+
+const deleteFieldSchema = z.object({
+	params: z.object({ fieldId: z.string() }),
+});
+
+const getFieldsSchema = z.object({
+	query: z.object({
+		page: z.string().regex(/^\d+$/).transform(Number).optional(),
+	}),
+});
+
 export {
 	farmerSchema,
 	updateFarmerSchema,
@@ -81,4 +113,8 @@ export {
 	updateFarmSchema,
 	deleteFarmSchema,
 	getFarmsSchema,
+	fieldSchema,
+	updateFieldSchema,
+	deleteFieldSchema,
+	getFieldsSchema,
 };
