@@ -8,21 +8,57 @@ import {
 	TableBody,
 	TableCaption,
 	TableCell,
+	TableFooter,
 	TableHead,
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { farmers } from "@/constants/data";
 import { cn, statusColor } from "@/lib/utils";
+import { useDeleteFarmersMutation, useGetFarmers } from "@/hooks/use-farmers";
+import type { Farmer, FarmersResponse } from "@/types/types";
+import { toast } from "sonner";
+import Pagination from "@/components/shared/Pagination";
 
 const Farmers = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
+	const [selectedFarmer, setSelectedFarmer] = useState<Farmer | null>(null);
+	const [page, setPage] = useState(1);
 
-	const updateFarmerDetails = () => {
+	const limit = 10;
+
+	const { data: farmersData, isPending } = useGetFarmers(page, limit) as {
+		data: FarmersResponse;
+		isPending: boolean;
+	};
+	const { mutate: deleteFarmer, isPending: isDeleting } =
+		useDeleteFarmersMutation();
+
+	const updateFarmerDetails = (id: string) => {
 		setIsOpen(true);
 		setIsEditing(true);
+
+		const selected =
+			farmersData?.farmers?.find((farmer: Farmer) => farmer._id === id) || null;
+		setSelectedFarmer(selected);
 	};
+
+	const onDeleteFarmer = (id: string) => {
+		deleteFarmer(
+			{ farmerId: id },
+			{
+				onSuccess: (data: any) => {
+					toast.success(data.message);
+				},
+				onError: (error: any) => {
+					const errorMessage = error.response.data.message;
+					toast.error(errorMessage);
+				},
+			}
+		);
+	};
+
+	if (isPending) return <div>Loading...</div>;
 
 	return (
 		<section className="space-y-6">
@@ -36,16 +72,22 @@ const Farmers = () => {
 
 				<Button
 					className="bg-green-500 text-white cursor-pointer flex items-center gap-2"
-					onClick={() => setIsOpen(true)}
+					onClick={() => {
+						setIsEditing(false);
+						setIsOpen(true);
+						setSelectedFarmer(null);
+					}}
 				>
 					<PlusCircle />
 					Add Farmer
 				</Button>
 
 				<AddFarmer
+					key={selectedFarmer?._id ?? "new"}
 					isOpen={isOpen}
 					setIsOpen={setIsOpen}
 					isEditing={isEditing}
+					farmer={selectedFarmer}
 				/>
 			</div>
 
@@ -84,27 +126,27 @@ const Farmers = () => {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{farmers.map((entry) => (
-									<TableRow key={entry.id}>
-										<TableCell>{entry.fullname}</TableCell>
-										<TableCell>{entry.email}</TableCell>
-										<TableCell>{entry.phone}</TableCell>
-										<TableCell>{entry.county}</TableCell>
+								{farmersData?.farmers?.map((farmer) => (
+									<TableRow key={farmer._id}>
+										<TableCell>{farmer.fullname}</TableCell>
+										<TableCell>{farmer.email}</TableCell>
+										<TableCell>{farmer.phone}</TableCell>
+										<TableCell>{farmer.county}</TableCell>
 										<TableCell>
 											<span
 												className={cn(
-													statusColor(entry.status),
+													statusColor(farmer.status),
 													"rounded-full px-2 py-1 text-xs font-semibold"
 												)}
 											>
-												{entry.status}
+												{farmer.status}
 											</span>
 										</TableCell>
 										<TableCell className="flex items-center gap-4">
 											<Button
 												size="sm"
 												className="bg-transparent text-black modal-close-btn"
-												onClick={updateFarmerDetails}
+												onClick={() => updateFarmerDetails(farmer._id)}
 											>
 												<SquarePen />
 											</Button>
@@ -112,7 +154,7 @@ const Farmers = () => {
 											<Button
 												size="sm"
 												className="bg-transparent text-red-500 hover:bg-green-900/10"
-												onClick={updateFarmerDetails}
+												onClick={() => onDeleteFarmer(farmer._id)}
 											>
 												<Trash2 />
 											</Button>
@@ -120,6 +162,21 @@ const Farmers = () => {
 									</TableRow>
 								))}
 							</TableBody>
+							<TableFooter>
+								<TableRow>
+									<TableCell colSpan={6}>
+										<div className="flex justify-center">
+											{farmersData?.pagination && (
+												<Pagination
+													currentPage={farmersData.pagination.page}
+													totalPages={farmersData.pagination.totalPages}
+													onPageChange={(newPage) => setPage(newPage)}
+												/>
+											)}
+										</div>
+									</TableCell>
+								</TableRow>
+							</TableFooter>
 						</Table>
 					</div>
 				</div>

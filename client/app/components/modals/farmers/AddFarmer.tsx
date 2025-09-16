@@ -13,16 +13,30 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import type { AddEntityModalProps } from "@/types/types";
+import {
+	useAddFarmersMutation,
+	useUpdateFarmersMutation,
+} from "@/hooks/use-farmers";
+import { toast } from "sonner";
+import Loading from "@/components/shared/Loading";
 
-const AddFarmer = ({ isOpen, setIsOpen, isEditing }: AddEntityModalProps) => {
+const AddFarmer = ({
+	isOpen,
+	setIsOpen,
+	isEditing,
+	farmer,
+}: AddEntityModalProps) => {
 	const form = useForm<AddFarmerSchema>({
 		resolver: zodResolver(addFarmerSchema),
 		defaultValues: {
-			fullname: "",
-			email: "",
-			phone: "",
-			county: "",
-			status: "active",
+			fullname: farmer?.fullname ?? "",
+			email: farmer?.email ?? "",
+			phone: farmer?.phone ?? "",
+			county: farmer?.county ?? "",
+			status:
+				farmer?.status === "active" || farmer?.status === "inactive"
+					? farmer.status
+					: "active",
 		},
 	});
 
@@ -31,18 +45,46 @@ const AddFarmer = ({ isOpen, setIsOpen, isEditing }: AddEntityModalProps) => {
 		{ label: "Inactive", value: "inactive" },
 	];
 
-	const onSubmit = () => {
-		if (isEditing) {
-			// Update existing farmer
-			// await updateFarmer(farmerId, formData);
-		} else {
-			// Add new farmer
-			// await createFarmer(formData);
-		}
+	const { mutate: addFarmer, isPending } = useAddFarmersMutation();
+	const { mutate: updateFarmer, isPending: isUpdating } =
+		useUpdateFarmersMutation();
 
-		// Optionally close dialog and reset form
-		// onClose();
-		// resetForm();
+	const onSubmit = (values: AddFarmerSchema) => {
+		if (isEditing) {
+			if (farmer?._id) {
+				updateFarmer(
+					{ farmerId: farmer._id, farmerData: values },
+					{
+						onSuccess: (data: any) => {
+							toast.success(data.message);
+							form.reset();
+							setIsOpen(false);
+						},
+						onError: (error: any) => {
+							const errorMessage = error.response.data.message;
+							toast.error(errorMessage);
+						},
+					}
+				);
+			} else {
+				toast.error("Farmer ID is missing.");
+			}
+		} else {
+			addFarmer(
+				{ farmerData: values },
+				{
+					onSuccess: (data: any) => {
+						toast.success(data.message);
+						form.reset();
+						setIsOpen(false);
+					},
+					onError: (error: any) => {
+						const errorMessage = error.response.data.message;
+						toast.error(errorMessage);
+					},
+				}
+			);
+		}
 	};
 
 	return (
@@ -106,8 +148,16 @@ const AddFarmer = ({ isOpen, setIsOpen, isEditing }: AddEntityModalProps) => {
 							<Button
 								type="submit"
 								className="bg-green-500 text-white"
+								disabled={isUpdating || isPending}
 							>
-								{isEditing ? "Save Changes" : "Add Farmer"}
+								{(isUpdating || isPending) && <Loading />}
+								{isEditing
+									? isUpdating
+										? "Saving..."
+										: "Save Changes"
+									: isPending
+										? "Adding..."
+										: "Add Farmer"}
 							</Button>
 						</DialogFooter>
 					</form>
