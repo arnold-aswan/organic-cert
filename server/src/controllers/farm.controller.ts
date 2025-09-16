@@ -55,7 +55,7 @@ const updateFarm = async (req: Request, res: Response): Promise<void> => {
 
 		res
 			.status(200)
-			.json({ message: "farm created successfully", data: updateFarm });
+			.json({ message: "farm updated successfully", data: updateFarm });
 		return;
 	} catch (error) {
 		console.error("Error updating farm:", error);
@@ -77,7 +77,7 @@ const deleteFarm = async (req: Request, res: Response): Promise<void> => {
 			return;
 		}
 
-		res.status(204).json({ message: "farm created successfully" });
+		res.status(204).json({ message: "farm deleted successfully" });
 		return;
 	} catch (error) {
 		console.error("Error creating farmer:", error);
