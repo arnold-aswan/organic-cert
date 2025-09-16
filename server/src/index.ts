@@ -10,6 +10,14 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.use(
+	cors({
+		origin: process.env.FRONTEND_URL,
+		methods: ["GET", "POST", "DELETE", "PUT"],
+		allowedHeaders: ["Content-Type", "Authorization"],
+	})
+);
+
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
