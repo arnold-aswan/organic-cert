@@ -73,7 +73,7 @@ const deleteField = async (req: Request, res: Response): Promise<void> => {
 			return;
 		}
 
-		res.status(204).json({ message: "field deleted successfully" });
+		res.status(200).json({ message: "field deleted successfully" });
 		return;
 	} catch (error) {
 		console.error("Error deleting field:", error);
@@ -94,10 +94,12 @@ const getFields = async (req: Request, res: Response): Promise<void> => {
 		]);
 
 		res.status(200).json({
-			page,
-			limit,
-			totalPages: Math.ceil(total / limit),
-			totalFields: total,
+			pagination: {
+				page,
+				limit,
+				totalPages: Math.ceil(total / limit),
+				total,
+			},
 			fields,
 		});
 		return;

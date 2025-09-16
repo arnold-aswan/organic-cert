@@ -83,8 +83,8 @@ const deleteFarmer = async (req: Request, res: Response) => {
 			return;
 		}
 
-		res.status(204).json({
-			message: "farmer updated successfully.",
+		res.status(200).json({
+			message: "farmer deleted successfully.",
 		});
 		return;
 	} catch (error) {
@@ -108,10 +108,12 @@ const getFarmers = async (req: Request, res: Response) => {
 		]);
 
 		res.status(200).json({
-			page,
-			limit,
-			totalPages: Math.ceil(total / limit),
-			totalFarmers: total,
+			pagination: {
+				page,
+				limit,
+				totalPages: Math.ceil(total / limit),
+				total,
+			},
 			farmers,
 		});
 		return;
