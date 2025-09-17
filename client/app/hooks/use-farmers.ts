@@ -11,6 +11,7 @@ export const useAddFarmersMutation = () => {
 		onSuccess: (data: any) => {
 			queryClient.invalidateQueries({
 				queryKey: ["farmers"],
+				exact: false,
 			});
 		},
 	});
@@ -24,7 +25,8 @@ export const useUpdateFarmersMutation = () => {
 			updateData(`/farmers/${data.farmerId}`, data.farmerData),
 		onSuccess: (data: any) => {
 			queryClient.invalidateQueries({
-				queryKey: ["farmers", data._id],
+				queryKey: ["farmers"],
+				exact: false,
 			});
 		},
 	});
@@ -38,7 +40,8 @@ export const useDeleteFarmersMutation = () => {
 			deleteData(`/farmers/${data.farmerId}`),
 		onSuccess: (data: any) => {
 			queryClient.invalidateQueries({
-				queryKey: ["farmers", data._id],
+				queryKey: ["farmers"],
+				exact: false,
 			});
 		},
 	});
@@ -47,7 +50,7 @@ export const useDeleteFarmersMutation = () => {
 export const useGetFarmers = (page: number, limit: number) => {
 	return useQuery({
 		queryKey: ["farmers", page, limit],
-		queryFn: () => fetchData("/farmers"),
+		queryFn: () => fetchData(`/farmers?page=${page}&limit=${limit}`),
 		staleTime: 10 * 60 * 1000,
 	});
 };
