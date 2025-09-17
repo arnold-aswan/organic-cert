@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import Farmer from "../models/farmer.model";
+import Farm from "../models/farm.model";
+import Field from "../models/field.model ";
 
 const addFarmer = async (req: Request, res: Response): Promise<void> => {
 	try {
@@ -83,8 +85,17 @@ const deleteFarmer = async (req: Request, res: Response) => {
 			return;
 		}
 
+		// .distinct => only gets farm IDs owned by this farmer
+		const farmIds = await Farm.distinct("_id", { farmerId });
+
+		await Farm.deleteMany({ farmerId });
+
+		if (farmIds.length > 0) {
+			await Field.deleteMany({ farmId: { $in: farmIds } });
+		}
+
 		res.status(200).json({
-			message: "farmer deleted successfully.",
+			message: "farmer, their farms and fields deleted successfully.",
 		});
 		return;
 	} catch (error) {
@@ -103,9 +114,30 @@ const getFarmers = async (req: Request, res: Response) => {
 		const skip = (page - 1) * limit;
 
 		const [farmers, total] = await Promise.all([
-			await Farmer.find().skip(skip).limit(limit),
+			await Farmer.find().skip(skip).limit(limit).lean(),
 			Farmer.countDocuments(),
 		]);
+
+		// collect farmer IDs
+		const farmerIds = farmers.map((farmer) => farmer._id);
+
+		// count farms per farmer
+		const farmCounts = await Farm.aggregate([
+			{ $match: { farmerId: { $in: farmerIds } } },
+			{ $group: { _id: "$farmerId", count: { $sum: 1 } } },
+		]);
+
+		// map results
+		const countsMap = farmCounts.reduce(
+			(acc, { _id, count }) => ({ ...acc, [_id.toString()]: count }),
+			{} as Record<string, number>
+		);
+
+		// attach counts
+		const farmersDetails = farmers.map((farmer) => ({
+			...farmer,
+			farmCount: countsMap[farmer._id.toString()] ?? 0,
+		}));
 
 		res.status(200).json({
 			pagination: {
@@ -114,7 +146,7 @@ const getFarmers = async (req: Request, res: Response) => {
 				totalPages: Math.ceil(total / limit),
 				total,
 			},
-			farmers,
+			farmers: farmersDetails,
 		});
 		return;
 	} catch (error) {

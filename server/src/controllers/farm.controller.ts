@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Farmer from "../models/farmer.model";
 import Farm from "../models/farm.model";
+import Field from "../models/field.model ";
 
 const addFarm = async (req: Request, res: Response): Promise<void> => {
 	try {
@@ -77,7 +78,11 @@ const deleteFarm = async (req: Request, res: Response): Promise<void> => {
 			return;
 		}
 
-		res.status(200).json({ message: "farm deleted successfully" });
+		await Field.deleteMany({ farmId });
+
+		res
+			.status(200)
+			.json({ message: "Farm and it's fields deleted successfully" });
 		return;
 	} catch (error) {
 		console.error("Error creating farmer:", error);
@@ -95,9 +100,34 @@ const getFarms = async (req: Request, res: Response): Promise<void> => {
 		const skip = (page - 1) * limit;
 
 		const [farms, total] = await Promise.all([
-			await Farm.find().skip(skip).limit(limit),
+			await Farm.find()
+				.skip(skip)
+				.limit(limit)
+				.populate("farmerId", "fullname")
+				.lean(),
 			Farm.countDocuments(),
 		]);
+
+		// Add field counts
+		const farmIds = farms.map((farm) => farm._id);
+		// count how many fields belong to each farm
+		const fieldCounts = await Field.aggregate([
+			{ $match: { farmId: { $in: farmIds } } },
+			{ $group: { _id: "$farmId", count: { $sum: 1 } } }, // => [{_id:"mongo id", "count": 2}]
+		]);
+
+		// Map counts back into farms
+		const countsMap = fieldCounts.reduce(
+			(acc, { _id, count }) => ({ ...acc, [_id.toString()]: count }),
+			{} as Record<string, number>
+		);
+
+		const farmsData = farms.map((farm) => ({
+			...farm,
+			farmerId: farm._id,
+			farmerName: (farm.farmerId as any)?.fullname ?? null,
+			fieldCount: countsMap[farm._id.toString()] ?? 0,
+		}));
 
 		res.status(200).json({
 			pagination: {
@@ -106,7 +136,7 @@ const getFarms = async (req: Request, res: Response): Promise<void> => {
 				totalPages: Math.ceil(total / limit),
 				total,
 			},
-			farms,
+			farms: farmsData,
 		});
 		return;
 	} catch (error) {

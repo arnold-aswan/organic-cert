@@ -89,9 +89,21 @@ const getFields = async (req: Request, res: Response): Promise<void> => {
 		const skip = (page - 1) * limit;
 
 		const [fields, total] = await Promise.all([
-			await Field.find().skip(skip).limit(limit),
+			await Field.find().skip(skip).limit(limit).populate("farmId", "name"),
 			Field.countDocuments(),
 		]);
+
+		const fieldsWithFarmName = fields.map((field) => ({
+			_id: field._id,
+			name: field.name,
+			farmId: field.farmId?._id ?? null,
+			farmName: (field.farmId as any)?.name ?? null,
+			area: field.area,
+			crop: field.crop,
+			status: field.status,
+			createdAt: field.createdAt,
+			updatedAt: field.updatedAt,
+		}));
 
 		res.status(200).json({
 			pagination: {
@@ -100,7 +112,7 @@ const getFields = async (req: Request, res: Response): Promise<void> => {
 				totalPages: Math.ceil(total / limit),
 				total,
 			},
-			fields,
+			fields: fieldsWithFarmName,
 		});
 		return;
 	} catch (error) {

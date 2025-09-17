@@ -9,7 +9,7 @@ const fieldSchema = new Schema(
 			required: true,
 		},
 		area: { type: Number, required: true }, // in HA
-		crop: [{ type: String }],
+		crop: { type: String },
 		status: {
 			type: String,
 			enum: ["planted", "growing", "harvested", "fallow"],
