@@ -5,6 +5,8 @@ import cors from "cors";
 import morgan from "morgan";
 import routes from "./routes/index";
 
+import expressJSDocSwagger from "express-jsdoc-swagger";
+
 dotenv.config();
 
 const app = express();
@@ -29,6 +31,28 @@ mongoose
 	.catch((err) => console.error("Failed to connect to Mongo DB", err));
 
 app.use(express.json());
+
+const options = {
+	info: {
+		version: "1.0.0",
+		title: "Agro-Organic API",
+		description: "API docs with express-jsdoc-swagger + TypeScript",
+	},
+	baseDir: __dirname,
+	filesPattern: "./routes/*.ts",
+	swaggerUIPath: "/api-docs",
+	exposeSwaggerUI: true,
+	exposeApiDocs: true,
+	apiDocsPath: "/api-docs.json",
+	servers: [
+		{
+			url: "http://localhost:5000/api-v1",
+			description: "Development server",
+		},
+	],
+};
+
+expressJSDocSwagger(app)(options);
 
 app.get("/health", async (req: Request, res: Response) => {
 	res.status(200).json({ message: "Green light!" });

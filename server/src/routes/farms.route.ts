@@ -15,9 +15,53 @@ import {
 
 const router = express.Router();
 
+/**
+ * A Farm type
+ * @typedef {object} Farm
+ * @property {string} name.required - Farm name
+ * @property {string} farmerId.required - Linked Farmer ID (ObjectId)
+ * @property {string} location.required - Farm location
+ * @property {number} area.required - Farm size in hectares
+ * @property {string} status - Farm status (active, pending review, inactive)
+ * @enum {string} status.active
+ * @enum {string} status["pending review"]
+ * @enum {string} status.inactive
+ */
+
+/**
+ * POST /farms/create
+ * @summary Create a new farm
+ * @tags Farms
+ * @param {Farm} request.body.required - Farm info
+ * @return {Farm} 201 - Created farm
+ */
 router.post("/create", validate(farmSchema), addFarm);
+
+/**
+ * PUT /farms/{farmId}
+ * @summary Update a farm
+ * @tags Farms
+ * @param {string} farmId.path.required - Farm ID
+ * @param {Farm} request.body.required - Updated farm data
+ * @return {Farm} 200 - Updated farm
+ */
 router.put("/:farmId", validate(updateFarmSchema), updateFarm);
+
+/**
+ * DELETE /farms/{farmId}
+ * @summary Delete a farm
+ * @tags Farms
+ * @param {string} farmId.path.required - Farm ID
+ * @return {object} 200 - Success message
+ */
 router.delete("/:farmId", validate(deleteFarmSchema), deleteFarm);
+
+/**
+ * GET /farms
+ * @summary Get all farms
+ * @tags Farms
+ * @return {array<Farm>} 200 - List of farms
+ */
 router.get("/", validate(getFarmsSchema), getFarms);
 
 export default router;
