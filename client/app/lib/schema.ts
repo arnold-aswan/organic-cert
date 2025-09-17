@@ -50,7 +50,7 @@ export const addFarmerSchema = z.object({
 });
 
 export const addFarmSchema = z.object({
-	farmName: z
+	name: z
 		.string()
 		.min(3, { message: "Farm name is required" })
 		.max(50, { message: "Farm name is too long" })
@@ -62,7 +62,7 @@ export const addFarmSchema = z.object({
 });
 
 export const addFieldSchema = z.object({
-	fieldName: z
+	name: z
 		.string()
 		.min(3, { message: "Field name is required" })
 		.max(50, { message: "Field name is too long" })

@@ -18,6 +18,7 @@ import { useDeleteFarmersMutation, useGetFarmers } from "@/hooks/use-farmers";
 import type { Farmer, FarmersResponse } from "@/types/types";
 import { toast } from "sonner";
 import Pagination from "@/components/shared/Pagination";
+import { farmersTableHeads } from "@/constants/data";
 
 const Farmers = () => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -87,7 +88,7 @@ const Farmers = () => {
 					isOpen={isOpen}
 					setIsOpen={setIsOpen}
 					isEditing={isEditing}
-					farmer={selectedFarmer}
+					data={selectedFarmer}
 				/>
 			</div>
 
@@ -105,24 +106,11 @@ const Farmers = () => {
 							<TableCaption>List of all farmers.</TableCaption>
 							<TableHeader>
 								<TableRow>
-									<TableHead className="table-head whitespace-nowrap">
-										Full Name
-									</TableHead>
-									<TableHead className="table-head whitespace-nowrap">
-										Email
-									</TableHead>
-									<TableHead className="table-head whitespace-nowrap">
-										Phone
-									</TableHead>
-									<TableHead className="table-head whitespace-nowrap">
-										County
-									</TableHead>
-									<TableHead className="table-head whitespace-nowrap">
-										Status
-									</TableHead>
-									<TableHead className="table-head whitespace-nowrap">
-										Actions
-									</TableHead>
+									{farmersTableHeads?.map((head) => (
+										<TableHead className="table-head whitespace-nowrap">
+											{head.value}
+										</TableHead>
+									))}
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -132,6 +120,7 @@ const Farmers = () => {
 										<TableCell>{farmer.email}</TableCell>
 										<TableCell>{farmer.phone}</TableCell>
 										<TableCell>{farmer.county}</TableCell>
+										<TableCell>{farmer.farmCount}</TableCell>
 										<TableCell>
 											<span
 												className={cn(
@@ -164,7 +153,7 @@ const Farmers = () => {
 							</TableBody>
 							<TableFooter>
 								<TableRow>
-									<TableCell colSpan={6}>
+									<TableCell colSpan={farmersTableHeads.length}>
 										<div className="flex justify-center">
 											{farmersData?.pagination && (
 												<Pagination

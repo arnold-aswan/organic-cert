@@ -8,13 +8,8 @@ export type InspectionEntry = {
 	status: "passed" | "failed" | "pending";
 };
 
-export type Farmer = {
-	id: string;
-	fullname: string;
-	email: string;
-	phone: string;
-	county: string;
-	status: "active" | "inactive";
+type TableHeads = {
+	value: string;
 };
 
 export const inspectionData: InspectionEntry[] = [
@@ -83,37 +78,71 @@ export const inspectionData: InspectionEntry[] = [
 	},
 ];
 
-export const farmers: Farmer[] = [
+export const farmersTableHeads: TableHeads[] = [
 	{
-		id: "1",
-		fullname: "John Doe",
-		email: "johndoe@example.com",
-		phone: "+254712345678",
-		county: "Nairobi",
-		status: "active",
+		value: "full name",
 	},
 	{
-		id: "2",
-		fullname: "Mary Wambui",
-		email: "mary.wambui@example.com",
-		phone: "+254711223344",
-		county: "Kiambu",
-		status: "inactive",
+		value: "email",
 	},
 	{
-		id: "3",
-		fullname: "Peter Otieno",
-		email: "peter.otieno@example.com",
-		phone: "+254733445566",
-		county: "Kisumu",
-		status: "active",
+		value: "phone",
 	},
 	{
-		id: "4",
-		fullname: "Grace Njeri",
-		email: "grace.njeri@example.com",
-		phone: "+254701112233",
-		county: "Mombasa",
-		status: "active",
+		value: "county",
+	},
+	{
+		value: "farms",
+	},
+	{
+		value: "status",
+	},
+	{
+		value: "actions",
+	},
+];
+
+export const farmsTableHeads: TableHeads[] = [
+	{
+		value: "farm name",
+	},
+	{
+		value: "farmer",
+	},
+	{
+		value: "location",
+	},
+	{
+		value: "area(Ha)",
+	},
+	{
+		value: "fields",
+	},
+	{
+		value: "status",
+	},
+	{
+		value: "actions",
+	},
+];
+
+export const fieldsTableHeads: TableHeads[] = [
+	{
+		value: "field name",
+	},
+	{
+		value: "farm",
+	},
+	{
+		value: "crop",
+	},
+	{
+		value: "area(Ha)",
+	},
+	{
+		value: "status",
+	},
+	{
+		value: "actions",
 	},
 ];

@@ -1,10 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 
-export interface AddEntityModalProps {
+export interface AddEntityModalProps<T> {
 	isOpen: boolean;
 	setIsOpen: (open: boolean) => void;
 	isEditing?: boolean;
-	farmer?: Farmer | null;
+	data?: T | null;
 }
 
 export interface DashAnalyticsCardProps {
@@ -24,6 +24,7 @@ export interface AnalyticsCardProps {
 export type Farmer = {
 	_id: string;
 	fullname: string;
+	farmCount: number;
 	email: string;
 	phone: string;
 	county: string;
@@ -43,4 +44,41 @@ type Pagination = {
 export type FarmersResponse = {
 	pagination: Pagination;
 	farmers: Farmer[];
+};
+
+export type FarmsResponse = {
+	pagination: Pagination;
+	farms: Farm[];
+};
+
+export type FieldsResponse = {
+	pagination: Pagination;
+	fields: Field[];
+};
+
+export type Farm = {
+	_id: string;
+	name: string;
+	farmerId: string;
+	farmerName: string;
+	fieldCount: number;
+	location: string;
+	area: number;
+	status: "active" | "pending review" | "inactive";
+	createdAt?: string;
+	updatedAt?: string;
+	__v?: number;
+};
+
+export type Field = {
+	_id: string;
+	name: string;
+	farmId: string;
+	farmName: string;
+	crop: string;
+	area: number;
+	status: "planted" | "growing" | "harvested" | "fallow";
+	createdAt?: string;
+	updatedAt?: string;
+	__v?: number;
 };
