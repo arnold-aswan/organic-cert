@@ -1,3 +1,4 @@
+import Loading from "@/components/shared/Loading";
 import ShadFormField from "@/components/shared/ShadFormField";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,24 +12,36 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import {
-	addFarmSchema,
-	addFieldSchema,
-	type AddFarmSchema,
-	type AddFieldSchema,
-} from "@/lib/schema";
-import type { AddEntityModalProps } from "@/types/types";
+	useAddFieldMutation,
+	useUpdateFieldMutation,
+} from "@/hooks/use-fields";
+import { useFarmOptions } from "@/hooks/useGetNamesById";
+import { addFieldSchema, type AddFieldSchema } from "@/lib/schema";
+import type { AddEntityModalProps, Field } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
-const AddField = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
+const AddField = ({
+	isOpen,
+	setIsOpen,
+	isEditing,
+	data,
+}: AddEntityModalProps<Field>) => {
 	const form = useForm<AddFieldSchema>({
 		resolver: zodResolver(addFieldSchema),
 		defaultValues: {
-			fieldName: "",
-			farmId: "",
-			crop: "",
-			area: 0,
-			status: "planted",
+			name: data?.name ?? "",
+			farmId: data?.farmId ?? "",
+			crop: data?.crop ?? "",
+			area: data?.area ?? 0,
+			status:
+				data?.status === "planted" ||
+				data?.status === "growing" ||
+				data?.status === "harvested" ||
+				data?.status === "fallow"
+					? data.status
+					: "planted",
 		},
 	});
 
@@ -39,7 +52,51 @@ const AddField = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 		{ label: "Fallow", value: "fallow" },
 	];
 
-	const onSubmit = () => {};
+	const { mutate: addField, isPending } = useAddFieldMutation();
+	const { mutate: updateField, isPending: isUpdating } =
+		useUpdateFieldMutation();
+
+	const onSubmit = (values: AddFieldSchema) => {
+		if (isEditing) {
+			if (data?._id) {
+				updateField(
+					{ fieldId: data._id, fieldData: values },
+					{
+						onSuccess: (data: any) => {
+							toast.success(data.message);
+							form.reset();
+							setIsOpen(false);
+						},
+						onError: (error: any) => {
+							const errorMessage = error.response.data.message;
+							toast.error(errorMessage);
+						},
+					}
+				);
+			} else {
+				toast.error("Field ID is missing.");
+			}
+		} else {
+			addField(
+				{ fieldData: values },
+				{
+					onSuccess: (data: any) => {
+						toast.success(data.message);
+						form.reset();
+						setIsOpen(false);
+					},
+					onError: (error: any) => {
+						const errorMessage = error.response.data.message;
+						toast.error(errorMessage);
+					},
+				}
+			);
+		}
+	};
+
+	const { farms, isLoading } = useFarmOptions();
+
+	if (isLoading) <div>Loading farms</div>;
 
 	return (
 		<Dialog
@@ -58,7 +115,7 @@ const AddField = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 						<div className="space-y-4 flex flex-wrap gap-3">
 							<ShadFormField
 								label="field name"
-								name="fieldName"
+								name="name"
 								type="text"
 								placeholder="enter field name"
 							/>
@@ -66,8 +123,9 @@ const AddField = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 							<ShadFormField
 								label="farm ID"
 								name="farmId"
-								type="text"
-								placeholder="enter farm ID"
+								type="select"
+								placeholder="select farm ID"
+								options={farms}
 							/>
 
 							<ShadFormField
@@ -81,7 +139,7 @@ const AddField = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 								label="area (Ha)"
 								name="area"
 								type="number"
-								placeholder="kenya"
+								placeholder="1"
 							/>
 
 							<ShadFormField
@@ -103,8 +161,16 @@ const AddField = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 							<Button
 								type="submit"
 								className="bg-green-500 text-white"
+								disabled={isUpdating || isPending}
 							>
-								Add Field
+								{(isUpdating || isPending) && <Loading />}
+								{isEditing
+									? isUpdating
+										? "Saving..."
+										: "Save Changes"
+									: isPending
+										? "Adding..."
+										: "Add Field"}
 							</Button>
 						</DialogFooter>
 					</form>

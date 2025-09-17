@@ -72,6 +72,19 @@ const ShadFormField = ({
 									))}
 								</SelectContent>
 							</Select>
+						) : type === "number" ? (
+							<Input
+								{...field}
+								id={name}
+								type={type}
+								placeholder={placeholder}
+								onChange={(e) => {
+									// Convert string to number for number inputs
+									const value = e.target.value;
+									field.onChange(value === "" ? 0 : Number(value));
+								}}
+								value={field.value || ""}
+							/>
 						) : (
 							<Input
 								{...field}

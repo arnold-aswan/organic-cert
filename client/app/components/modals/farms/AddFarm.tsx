@@ -11,19 +11,33 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { addFarmSchema, type AddFarmSchema } from "@/lib/schema";
-import type { AddEntityModalProps } from "@/types/types";
+import type { AddEntityModalProps, Farm, FarmersResponse } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import Loading from "@/components/shared/Loading";
+import { useAddFarmMutation, useUpdateFarmMutation } from "@/hooks/use-farms";
+import { toast } from "sonner";
+import { useGetFarmers } from "@/hooks/use-farmers";
 
-const AddFarm = ({ isOpen, setIsOpen, isEditing }: AddEntityModalProps) => {
+const AddFarm = ({
+	isOpen,
+	setIsOpen,
+	isEditing,
+	data,
+}: AddEntityModalProps<Farm>) => {
 	const form = useForm<AddFarmSchema>({
 		resolver: zodResolver(addFarmSchema),
 		defaultValues: {
-			farmName: "",
-			farmerId: "",
-			location: "",
-			area: 0,
-			status: "pending review",
+			name: data?.name ?? "",
+			farmerId: data?.farmerId ?? "",
+			location: data?.location ?? "",
+			area: data?.area ?? 0,
+			status:
+				data?.status === "active" ||
+				data?.status === "inactive" ||
+				data?.status === "pending review"
+					? data.status
+					: "pending review",
 		},
 	});
 
@@ -33,7 +47,58 @@ const AddFarm = ({ isOpen, setIsOpen, isEditing }: AddEntityModalProps) => {
 		{ label: "Inactive", value: "inactive" },
 	];
 
-	const onSubmit = () => {};
+	const { data: farmersData, isPending: isLoading } = useGetFarmers(1, 20) as {
+		data: FarmersResponse;
+		isPending: boolean;
+	};
+	const { mutate: addFarm, isPending } = useAddFarmMutation();
+	const { mutate: updateFarm, isPending: isUpdating } = useUpdateFarmMutation();
+
+	const onSubmit = (values: AddFarmSchema) => {
+		if (isEditing) {
+			if (data?._id) {
+				updateFarm(
+					{ farmId: data._id, farmData: values },
+					{
+						onSuccess: (data: any) => {
+							toast.success(data.message);
+							form.reset();
+							setIsOpen(false);
+						},
+						onError: (error: any) => {
+							const errorMessage = error.response.data.message;
+							toast.error(errorMessage);
+						},
+					}
+				);
+			} else {
+				toast.error("Farm ID is missing.");
+			}
+		} else {
+			addFarm(
+				{ farmData: values },
+				{
+					onSuccess: (data: any) => {
+						toast.success(data.message);
+						form.reset();
+						setIsOpen(false);
+					},
+					onError: (error: any) => {
+						const errorMessage = error.response.data.message;
+						toast.error(errorMessage);
+					},
+				}
+			);
+		}
+	};
+
+	const farmers =
+		farmersData?.farmers?.map((farmer) => ({
+			label: farmer.fullname,
+			value: farmer._id,
+		})) || [];
+
+	if (isLoading) <div>Loading farmers</div>;
 
 	return (
 		<Dialog
@@ -51,16 +116,16 @@ const AddFarm = ({ isOpen, setIsOpen, isEditing }: AddEntityModalProps) => {
 					>
 						<ShadFormField
 							label="farm name"
-							name="farmName"
+							name="name"
 							type="text"
 							placeholder="enter farm name"
 						/>
-
 						<ShadFormField
 							label="farmer ID"
 							name="farmerId"
-							type="text"
-							placeholder="enter farmer ID"
+							type="select"
+							placeholder="select farmer ID"
+							options={farmers}
 						/>
 
 						<ShadFormField
@@ -69,12 +134,11 @@ const AddFarm = ({ isOpen, setIsOpen, isEditing }: AddEntityModalProps) => {
 							type="text"
 							placeholder="enter farm location"
 						/>
-
 						<ShadFormField
 							label="area (Ha)"
 							name="area"
 							type="number"
-							placeholder="kenya"
+							placeholder="1"
 						/>
 
 						<ShadFormField
@@ -83,7 +147,6 @@ const AddFarm = ({ isOpen, setIsOpen, isEditing }: AddEntityModalProps) => {
 							type="select"
 							options={farmStatus}
 						/>
-
 						<DialogFooter className="flex items-center justify-end gap-4 pt-4">
 							<DialogClose asChild>
 								<Button
@@ -96,8 +159,16 @@ const AddFarm = ({ isOpen, setIsOpen, isEditing }: AddEntityModalProps) => {
 							<Button
 								type="submit"
 								className="bg-green-500 text-white"
+								disabled={isUpdating || isPending}
 							>
-								Add Farm
+								{(isUpdating || isPending) && <Loading />}
+								{isEditing
+									? isUpdating
+										? "Saving..."
+										: "Save Changes"
+									: isPending
+										? "Adding..."
+										: "Add Farm"}
 							</Button>
 						</DialogFooter>
 					</form>

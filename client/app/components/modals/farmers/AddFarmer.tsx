@@ -12,7 +12,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import type { AddEntityModalProps } from "@/types/types";
+import type { AddEntityModalProps, Farmer } from "@/types/types";
 import {
 	useAddFarmersMutation,
 	useUpdateFarmersMutation,
@@ -24,18 +24,18 @@ const AddFarmer = ({
 	isOpen,
 	setIsOpen,
 	isEditing,
-	farmer,
-}: AddEntityModalProps) => {
+	data,
+}: AddEntityModalProps<Farmer>) => {
 	const form = useForm<AddFarmerSchema>({
 		resolver: zodResolver(addFarmerSchema),
 		defaultValues: {
-			fullname: farmer?.fullname ?? "",
-			email: farmer?.email ?? "",
-			phone: farmer?.phone ?? "",
-			county: farmer?.county ?? "",
+			fullname: data?.fullname ?? "",
+			email: data?.email ?? "",
+			phone: data?.phone ?? "",
+			county: data?.county ?? "",
 			status:
-				farmer?.status === "active" || farmer?.status === "inactive"
-					? farmer.status
+				data?.status === "active" || data?.status === "inactive"
+					? data.status
 					: "active",
 		},
 	});
@@ -51,9 +51,9 @@ const AddFarmer = ({
 
 	const onSubmit = (values: AddFarmerSchema) => {
 		if (isEditing) {
-			if (farmer?._id) {
+			if (data?._id) {
 				updateFarmer(
-					{ farmerId: farmer._id, farmerData: values },
+					{ farmerId: data._id, farmerData: values },
 					{
 						onSuccess: (data: any) => {
 							toast.success(data.message);
