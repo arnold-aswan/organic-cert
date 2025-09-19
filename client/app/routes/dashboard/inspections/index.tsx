@@ -8,7 +8,7 @@ import {
 	PlusCircle,
 	SquarePen,
 } from "@/assets/icons";
-import Inspection from "@/components/modals/inspections/Inspection";
+import AddInspection from "@/components/modals/inspections/Inspection";
 import AnalyticsCard from "@/components/cards/shared/AnalyticsCard";
 import {
 	Table,
@@ -19,11 +19,55 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { inspectionData } from "@/constants/data";
+import { inspectionsTableHeads } from "@/constants/data";
 import { cn, complianceColor } from "@/lib/utils";
+import type {
+	Inspection as InspectionProps,
+	InspectionsAnalyticsDataResponse,
+	InspectionsResponse,
+} from "@/types/types";
+import {
+	useGetInspections,
+	useGetInspectionsAnalytics,
+} from "@/hooks/useInspections";
+import { format } from "date-fns";
+import Loading from "@/components/shared/Loading";
 
 const Inspections = () => {
 	const [isOpen, setIsOpen] = useState(false);
+	const [isEditing, setIsEditing] = useState(false);
+	const [selectedInspection, setSelectedInspection] =
+		useState<InspectionProps | null>(null);
+	const [page, setPage] = useState(1);
+	const limit = 10;
+
+	const { data: inspectionsAnalyticsData, isPending: loadingAnalytics } =
+		useGetInspectionsAnalytics() as {
+			data: InspectionsAnalyticsDataResponse;
+			isPending: boolean;
+		};
+	const { data: inspectionsData, isPending } = useGetInspections(
+		page,
+		limit
+	) as {
+		data: InspectionsResponse;
+		isPending: boolean;
+	};
+
+	const updateInspectionDetails = (id: string) => {
+		setIsOpen(true);
+		setIsEditing(true);
+
+		const selected =
+			inspectionsData?.inspections?.find(
+				(inspection: InspectionProps) => inspection._id === id
+			) || null;
+		setSelectedInspection(selected);
+	};
+
+	console.log(inspectionsData);
+
+	if (isPending) return <div>Loading...</div>;
 
 	return (
 		<section className="space-y-6">
@@ -43,40 +87,50 @@ const Inspections = () => {
 					New Inspection
 				</Button>
 
-				<Inspection
+				<AddInspection
+					key={selectedInspection?._id ?? "new"}
 					isOpen={isOpen}
 					setIsOpen={setIsOpen}
+					isEditing={isEditing}
+					data={selectedInspection}
 				/>
 			</div>
 
-			<div className="flex flex-col flex-wrap md:flex-row gap-4 md:gap-6 lg:gap-8">
-				<AnalyticsCard
-					value={24}
-					title="total inspections"
-					icon={ClipboardList}
-					iconColor={"text-blue-400"}
-				/>
+			{loadingAnalytics ? (
+				<div className="flex flex-col gap-2 items-center">
+					<Loading />
+					<p>Loading analytics data...</p>
+				</div>
+			) : (
+				<div className="flex flex-col flex-wrap md:flex-row gap-4 md:gap-6 lg:gap-8">
+					<AnalyticsCard
+						value={inspectionsAnalyticsData?.totalInspections}
+						title="total inspections"
+						icon={ClipboardList}
+						iconColor={"text-blue-400"}
+					/>
 
-				<AnalyticsCard
-					value={24}
-					title="approved"
-					icon={ClipboardCheck}
-				/>
+					<AnalyticsCard
+						value={inspectionsAnalyticsData?.approvedInspections}
+						title="approved"
+						icon={ClipboardCheck}
+					/>
 
-				<AnalyticsCard
-					value={24}
-					title="under review"
-					icon={ClipboardClock}
-					iconColor={"text-yellow-400"}
-				/>
+					<AnalyticsCard
+						value={inspectionsAnalyticsData?.reviewInspections}
+						title="under review"
+						icon={ClipboardClock}
+						iconColor={"text-yellow-400"}
+					/>
 
-				<AnalyticsCard
-					value={"85%"}
-					title="avg compliance score"
-					icon={ChartPie}
-					iconColor={"text-indigo-400"}
-				/>
-			</div>
+					<AnalyticsCard
+						value={`${inspectionsAnalyticsData?.averageComplianceScore?.toFixed(2)}%`}
+						title="avg compliance score"
+						icon={ChartPie}
+						iconColor={"text-indigo-400"}
+					/>
+				</div>
+			)}
 
 			<div className="w-full max-w-full overflow-hidden">
 				<div
@@ -92,36 +146,23 @@ const Inspections = () => {
 							<TableCaption>List of all inspections.</TableCaption>
 							<TableHeader>
 								<TableRow>
-									<TableHead className="table-head whitespace-nowrap">
-										Farm
-									</TableHead>
-									<TableHead className="table-head whitespace-nowrap">
-										Farmer
-									</TableHead>
-									<TableHead className="table-head whitespace-nowrap">
-										Inspection Date
-									</TableHead>
-									<TableHead className="table-head whitespace-nowrap">
-										Inspector
-									</TableHead>
-									<TableHead className="table-head whitespace-nowrap">
-										Compliance Score
-									</TableHead>
-									<TableHead className="table-head whitespace-nowrap">
-										Status
-									</TableHead>
-									<TableHead className="table-head whitespace-nowrap">
-										Action
-									</TableHead>
+									{inspectionsTableHeads.map((entry) => (
+										<TableHead
+											key={entry.value}
+											className="table-head whitespace-nowrap"
+										>
+											{entry.value}
+										</TableHead>
+									))}
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{inspectionData.map((entry) => (
-									<TableRow key={entry.id}>
-										<TableCell>{entry.farm}</TableCell>
-										<TableCell>{entry.farmer}</TableCell>
-										<TableCell>{entry.inspectionDate}</TableCell>
-										<TableCell>{entry.inspector}</TableCell>
+								{inspectionsData?.inspections?.map((entry) => (
+									<TableRow key={entry._id}>
+										<TableCell>{entry.farmId.name}</TableCell>
+										<TableCell>{format(entry.inspectionDate, "P")}</TableCell>
+										<TableCell>{entry.inspectorName}</TableCell>
+
 										<TableCell
 											className={cn(complianceColor(entry.complianceScore))}
 										>
@@ -132,6 +173,8 @@ const Inspections = () => {
 											<Button
 												size="sm"
 												className="bg-transparent text-black modal-close-btn"
+												onClick={() => updateInspectionDetails(entry._id)}
+												disabled={entry.status.toLowerCase() !== "draft"}
 											>
 												<SquarePen />
 											</Button>

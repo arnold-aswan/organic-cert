@@ -1,9 +1,25 @@
 import { Button } from "@/components/ui/button";
-import { PlusCircle, SquarePen, Trash2 } from "@/assets/icons";
+import {
+	CircleDot,
+	Leaf,
+	PlusCircle,
+	SquarePen,
+	Trash2,
+	Wheat,
+	WheatOff,
+} from "@/assets/icons";
 import { useState } from "react";
 import AddField from "@/components/modals/fields/AddField";
-import type { FieldsResponse, Field } from "@/types/types";
-import { useDeleteFieldMutation, useGetFields } from "@/hooks/use-fields";
+import type {
+	FieldsResponse,
+	Field,
+	FieldsAnalyticsDataResponse,
+} from "@/types/types";
+import {
+	useDeleteFieldMutation,
+	useGetFields,
+	useGetFieldsAnalytics,
+} from "@/hooks/useFields";
 import { toast } from "sonner";
 import {
 	Table,
@@ -17,6 +33,8 @@ import {
 } from "@/components/ui/table";
 import Pagination from "@/components/shared/Pagination";
 import { fieldsTableHeads } from "@/constants/data";
+import Loading from "@/components/shared/Loading";
+import AnalyticsCard from "@/components/cards/shared/AnalyticsCard";
 
 const Fields = () => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +42,12 @@ const Fields = () => {
 	const [selectedField, setSelectedField] = useState<Field | null>(null);
 	const [page, setPage] = useState(1);
 	const limit = 10;
+
+	const { data: fieldsAnalyticsData, isPending: loadingAnalytics } =
+		useGetFieldsAnalytics() as {
+			data: FieldsAnalyticsDataResponse;
+			isPending: boolean;
+		};
 
 	const { data: fieldsData, isPending } = useGetFields(page, limit) as {
 		data: FieldsResponse;
@@ -85,6 +109,41 @@ const Fields = () => {
 					data={selectedField}
 				/>
 			</div>
+
+			{loadingAnalytics ? (
+				<div className="flex flex-col gap-2 items-center">
+					<Loading />
+					<p>Loading analytics data...</p>
+				</div>
+			) : (
+				<div className="flex flex-col flex-wrap md:flex-row gap-4 md:gap-6 lg:gap-8">
+					<AnalyticsCard
+						value={fieldsAnalyticsData?.totalFields}
+						title="total fields"
+						icon={Wheat}
+					/>
+
+					<AnalyticsCard
+						value={fieldsAnalyticsData?.growingFields}
+						title="currently growing"
+						icon={Leaf}
+					/>
+
+					<AnalyticsCard
+						value={fieldsAnalyticsData?.harvestedFields}
+						title="harvested"
+						icon={WheatOff}
+						iconColor={"text-yellow-400"}
+					/>
+
+					<AnalyticsCard
+						value={fieldsAnalyticsData?.totalHectares}
+						title="total hectares"
+						icon={CircleDot}
+						iconColor={"text-indigo-400"}
+					/>
+				</div>
+			)}
 
 			<div className="w-full max-w-full overflow-hidden">
 				<div

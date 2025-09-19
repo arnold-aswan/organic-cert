@@ -14,7 +14,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { cn, statusColor } from "@/lib/utils";
-import { useDeleteFarmersMutation, useGetFarmers } from "@/hooks/use-farmers";
+import { useDeleteFarmersMutation, useGetFarmers } from "@/hooks/useFarmers";
 import type { Farmer, FarmersResponse } from "@/types/types";
 import { toast } from "sonner";
 import Pagination from "@/components/shared/Pagination";
