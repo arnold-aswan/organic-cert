@@ -15,4 +15,9 @@ export {
 	Trash2,
 	Sprout,
 	Loader,
+	Leaf,
+	WheatOff,
+	CircleDot,
+	Tractor,
+	Vegan,
 } from "lucide-react";

@@ -146,3 +146,27 @@ export const fieldsTableHeads: TableHeads[] = [
 		value: "actions",
 	},
 ];
+
+export const inspectionsTableHeads: TableHeads[] = [
+	{
+		value: "farm ",
+	},
+	// {
+	// 	value: "farmer",
+	// },
+	{
+		value: "inspection date",
+	},
+	{
+		value: "inspector",
+	},
+	{
+		value: "compliance score",
+	},
+	{
+		value: "status",
+	},
+	{
+		value: "actions",
+	},
+];
