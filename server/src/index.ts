@@ -6,6 +6,7 @@ import morgan from "morgan";
 import routes from "./routes/index";
 
 import expressJSDocSwagger from "express-jsdoc-swagger";
+import path from "path";
 
 dotenv.config();
 
@@ -23,14 +24,13 @@ app.use(
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
+app.use("/storage", express.static(path.join(__dirname, "../storage")));
 
 // DB CONNECTION
 mongoose
 	.connect(process.env.MONGODB_URI as string)
 	.then(() => console.log("Connected to Mongo DB"))
 	.catch((err) => console.error("Failed to connect to Mongo DB", err));
-
-app.use(express.json());
 
 const options = {
 	info: {
