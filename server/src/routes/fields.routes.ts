@@ -3,6 +3,7 @@ import { validate } from "../middlewares/validate";
 import {
 	addField,
 	deleteField,
+	fieldAnalytics,
 	getFields,
 	updateField,
 } from "../controllers/field.controller";
@@ -64,5 +65,20 @@ router.delete("/:fieldId", validate(deleteFieldSchema), deleteField);
  * @return {array<Field>} 200 - List of fields
  */
 router.get("/", validate(getFieldsSchema), getFields);
+
+/**
+ * GET /fields/analytics
+ * @summary Get field analytics
+ * @tags Analytics
+ * @return {object} 200 - Analytics summary
+ * @example response - 200 - success
+ * {
+ *   "totalFields": 12,
+ *   "growingFields": 7,
+ *   "harvestedFields": 3,
+ *   "totalHectares": 82
+ * }
+ */
+router.get("/analytics", fieldAnalytics);
 
 export default router;

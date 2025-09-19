@@ -122,4 +122,38 @@ const getFields = async (req: Request, res: Response): Promise<void> => {
 	}
 };
 
-export { addField, updateField, deleteField, getFields };
+const fieldAnalytics = async (req: Request, res: Response): Promise<void> => {
+	try {
+		const [totalFields, growingFields, harvestedFields, totalHectaresAgg] =
+			await Promise.all([
+				Field.countDocuments(),
+				Field.find({ status: "growing" }).countDocuments(),
+				Field.find({ status: "harvested" }).countDocuments(),
+				Field.aggregate([
+					{
+						$group: {
+							_id: null,
+							total: { $sum: "$area" },
+						},
+					},
+				]),
+			]);
+
+		res.status(200).json({
+			totalFields,
+			growingFields,
+			harvestedFields,
+			totalHectares:
+				totalHectaresAgg.length > 0 ? totalHectaresAgg[0].total : 0,
+		});
+		return;
+	} catch (error) {
+		console.error("Error fetching field analytics:", error);
+		res.status(500).json({
+			message: "Internal server error",
+		});
+		return;
+	}
+};
+
+export { addField, updateField, deleteField, getFields, fieldAnalytics };

@@ -9,6 +9,7 @@ import {
 import {
 	addFarm,
 	deleteFarm,
+	farmAnalytics,
 	getFarms,
 	updateFarm,
 } from "../controllers/farm.controller";
@@ -63,5 +64,20 @@ router.delete("/:farmId", validate(deleteFarmSchema), deleteFarm);
  * @return {array<Farm>} 200 - List of farms
  */
 router.get("/", validate(getFarmsSchema), getFarms);
+
+/**
+ * GET /farms/analytics
+ * @summary Get farms analytics
+ * @tags Analytics
+ * @return {object} 200 - Analytics summary
+ * @example response - 200 - success
+ * {
+ *   "totalFarms": 12,
+ *   "activeFarms": 7,
+ *   "pendingFarms": 3,
+ *   "totalHectares": 82
+ * }
+ */
+router.get("/analytics", farmAnalytics);
 
 export default router;

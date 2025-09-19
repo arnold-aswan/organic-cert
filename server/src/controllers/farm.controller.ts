@@ -148,4 +148,38 @@ const getFarms = async (req: Request, res: Response): Promise<void> => {
 	}
 };
 
-export { addFarm, updateFarm, deleteFarm, getFarms };
+const farmAnalytics = async (req: Request, res: Response): Promise<void> => {
+	try {
+		const [totalFarms, activeFarms, pendingFarms, totalHectaresAgg] =
+			await Promise.all([
+				Farm.countDocuments(),
+				Farm.find({ status: "active" }).countDocuments(),
+				Farm.find({ status: "pending review" }).countDocuments(),
+				Farm.aggregate([
+					{
+						$group: {
+							_id: null,
+							total: { $sum: "$area" },
+						},
+					},
+				]),
+			]);
+
+		res.status(200).json({
+			totalFarms,
+			activeFarms,
+			pendingFarms,
+			totalHectares:
+				totalHectaresAgg.length > 0 ? totalHectaresAgg[0].total : 0,
+		});
+		return;
+	} catch (error) {
+		console.error("Error fetching farm analytics:", error);
+		res.status(500).json({
+			message: "Internal server error",
+		});
+		return;
+	}
+};
+
+export { addFarm, updateFarm, deleteFarm, getFarms, farmAnalytics };
