@@ -104,6 +104,37 @@ const getFieldsSchema = z.object({
 	}),
 });
 
+// INSPECTION SCHEMA
+const inspectionsSchema = z.object({
+	farmId: z.string().min(1, { message: "Farm ID is required" }),
+	inspectionDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
+		message: "Invalid date format",
+	}),
+	inspectorName: z.string().min(3, { message: "Inspector name is required" }),
+	status: z
+		.enum(["Draft", "Submitted", "Approved", "Rejected"])
+		.default("Draft"),
+	compliance: z.object({
+		q1: z.boolean(),
+		q2: z.boolean(),
+		q3: z.boolean(),
+		q4: z.boolean(),
+		q5: z.boolean(),
+	}),
+	notes: z.string().optional(),
+});
+
+const inspectionSchema = z.object({
+	body: inspectionsSchema,
+});
+// COMPLIANCE SCHEMA
+const complianceQuestionsSchema = z.object({
+	key: z.string(),
+	label: z.string(),
+	description: z.string(),
+	expectedAnswer: z.boolean(),
+});
+
 export {
 	farmerSchema,
 	updateFarmerSchema,
@@ -117,4 +148,6 @@ export {
 	updateFieldSchema,
 	deleteFieldSchema,
 	getFieldsSchema,
+	complianceQuestionsSchema,
+	inspectionSchema,
 };
