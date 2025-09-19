@@ -16,7 +16,7 @@ import type { AddEntityModalProps, Farmer } from "@/types/types";
 import {
 	useAddFarmersMutation,
 	useUpdateFarmersMutation,
-} from "@/hooks/use-farmers";
+} from "@/hooks/useFarmers";
 import { toast } from "sonner";
 import Loading from "@/components/shared/Loading";
 

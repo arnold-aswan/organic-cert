@@ -53,3 +53,11 @@ export const useGetFields = (page: number, limit: number) => {
 		staleTime: 10 * 6 * 1000,
 	});
 };
+
+export const useGetFieldsAnalytics = () => {
+	return useQuery({
+		queryKey: ["fields"],
+		queryFn: () => fetchData("/fields/analytics"),
+		staleTime: 10 * 6 * 1000,
+	});
+};

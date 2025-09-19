@@ -11,10 +11,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
-import {
-	useAddFieldMutation,
-	useUpdateFieldMutation,
-} from "@/hooks/use-fields";
+import { useAddFieldMutation, useUpdateFieldMutation } from "@/hooks/useFields";
 import { useFarmOptions } from "@/hooks/useGetNamesById";
 import { addFieldSchema, type AddFieldSchema } from "@/lib/schema";
 import type { AddEntityModalProps, Field } from "@/types/types";

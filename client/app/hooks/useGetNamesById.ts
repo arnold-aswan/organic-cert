@@ -1,6 +1,6 @@
 import type { FarmersResponse, FarmsResponse } from "@/types/types";
-import { useGetFarmers } from "./use-farmers";
-import { useGetFarms } from "./use-farms";
+import { useGetFarmers } from "./useFarmers";
+import { useGetFarms } from "./useFarms";
 
 export const useFarmerOptions = (page = 1, limit = 20) => {
 	const { data, isPending } = useGetFarmers(page, limit) as {

@@ -51,3 +51,11 @@ export const useGetFarms = (page: number, limit: number) => {
 		staleTime: 10 * 6 * 1000,
 	});
 };
+
+export const useGetFarmsAnalytics = () => {
+	return useQuery({
+		queryKey: ["farms"],
+		queryFn: () => fetchData("/farms/analytics"),
+		staleTime: 10 * 6 * 1000,
+	});
+};

@@ -1,3 +1,4 @@
+import Loading from "@/components/shared/Loading";
 import ShadFormField from "@/components/shared/ShadFormField";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,45 +19,141 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
+import { useFarmOptions } from "@/hooks/useGetNamesById";
 import {
-	complianceQuestions,
-	inspectionSchema,
-	type InspectionSchema,
-} from "@/lib/schema";
-import { calculateComplianceScore, complianceColor } from "@/lib/utils";
-import type { AddEntityModalProps } from "@/types/types";
+	useCreateInspectionMutation,
+	useGetComplianceQuestions,
+	useUpdateInspectionMutation,
+} from "@/hooks/useInspections";
+import { inspectionSchema, type InspectionSchema } from "@/lib/schema";
+import {
+	buildDefaultCompliance,
+	calculateComplianceScore,
+	complianceColor,
+	denormalizeCompliance,
+	normalizeCompliance,
+} from "@/lib/utils";
+import type {
+	AddEntityModalProps,
+	ComplianceQuestionsResponse,
+	Inspection,
+} from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-const Inspection = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
+const AddInspection = ({
+	isOpen,
+	setIsOpen,
+	isEditing,
+	data,
+}: AddEntityModalProps<Inspection>) => {
+	const { data: complianceQuiz, isPending } = useGetComplianceQuestions() as {
+		data: ComplianceQuestionsResponse;
+		isPending: boolean;
+	};
+	const { farms, isLoading } = useFarmOptions(1, 10);
+
+	const { mutate: createInspection, isPending: isCreatingInspection } =
+		useCreateInspectionMutation();
+	const { mutate: updateInspection, isPending: isUpdating } =
+		useUpdateInspectionMutation();
+
 	const form = useForm<InspectionSchema>({
 		resolver: zodResolver(inspectionSchema),
 		defaultValues: {
-			farmId: "",
-			inspectionDate: "",
-			inspectorName: "",
-			findings: "",
-			status: "pending",
-			compliance: {
-				q1: false,
-				q2: false,
-				q3: false,
-				q4: false,
-				q5: false,
-			},
+			farmId: data?.farmId?.farmId ?? "",
+			inspectionDate: data?.inspectionDate ?? "",
+			inspectorName: data?.inspectorName ?? "",
+			notes: data?.notes ?? "",
+			status:
+				data?.status === "Draft" ||
+				data?.status === "Submitted" ||
+				data?.status === "Approved" ||
+				data?.status === "Rejected"
+					? data.status
+					: "Draft",
+			compliance: {},
+			// data?.compliance ?? buildDefaultCompliance(complianceQuiz || []),
 		},
 	});
 
-	const fieldStatus = [
-		{ label: "Planted", value: "planted" },
-		{ label: "Growing", value: "growing" },
-		{ label: "Harvested", value: "harvested" },
-		{ label: "Fallow", value: "fallow" },
-	];
+	// useEffect(() => {
+	// 	if (complianceQuiz && !isPending) {
+	// 		form.reset({
+	// 			...form.getValues(),
+	// 			compliance:
+	// 				isEditing && data?.compliance
+	// 					? normalizeCompliance(data.compliance) // editing → use saved data
+	// 					: buildDefaultCompliance(complianceQuiz), // new → all false
+	// 		});
+	// 	}
+	// }, [complianceQuiz, isPending, data, isEditing]);
 
-	const complianceScore = calculateComplianceScore(form.watch("compliance"));
+	useEffect(() => {
+		if (complianceQuiz && !isPending) {
+			form.reset({
+				...form.getValues(),
+				farmId: data?.farmId?.farmId ?? "", // since your backend sends farmId as object
+				inspectionDate: data?.inspectionDate ?? "",
+				inspectorName: data?.inspectorName ?? "",
+				notes: data?.notes ?? "",
+				status: data?.status ?? "Draft",
+				compliance:
+					isEditing && data?.compliance
+						? normalizeCompliance(data.compliance) // ✅ normalize backend array
+						: buildDefaultCompliance(complianceQuiz), // ✅ all false for new inspection
+			});
+		}
+	}, [complianceQuiz, isPending, data, isEditing]);
 
-	const onSubmit = () => {};
+	const complianceScore = calculateComplianceScore(
+		form.watch("compliance"),
+		complianceQuiz || []
+	);
+
+	const handleSaveDraft = (values: InspectionSchema) => {
+		console.log("values", values);
+		const isoDate = new Date(values.inspectionDate).toISOString();
+		const payload = {
+			...values,
+			inspectionDate: isoDate,
+			status: "Draft" as const,
+		};
+		if (isEditing && data?._id) {
+			updateInspection({ inspectionId: data._id, inspectionData: payload });
+		} else {
+			createInspection({ inspectionData: payload });
+		}
+		form.reset();
+		setIsOpen(false);
+	};
+
+	const onSubmit = (values: InspectionSchema) => {
+		console.log("values submit", values);
+		const isoDate = new Date(values.inspectionDate).toISOString();
+		const payload = {
+			...values,
+			inspectionDate: isoDate,
+			status: "Submitted" as const,
+		};
+
+		console.log("payload submit", payload);
+
+		if (isEditing && data?._id) {
+			updateInspection({ inspectionId: data._id, inspectionData: payload });
+		} else {
+			createInspection({ inspectionData: payload });
+		}
+		form.reset();
+		setIsOpen(false);
+	};
+
+	console.log(complianceQuiz);
+
+	if (isPending || isLoading) {
+		return <div>Loading compliance questions…</div>;
+	}
 
 	return (
 		<Dialog
@@ -76,8 +173,9 @@ const Inspection = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 							<ShadFormField
 								label="farm ID"
 								name="farmId"
-								type="text"
+								type="select"
 								placeholder="enter farm"
+								options={farms}
 							/>
 
 							<ShadFormField
@@ -93,16 +191,15 @@ const Inspection = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 								label="inspector"
 								name="inspectorName"
 								type="text"
-								// placeholder="enter field crop"
 							/>
 
 							<div className="bg-gray-100 p-2 rounded-md">
 								<h4 className="font-semibold">Compliance Checklist</h4>
-								{complianceQuestions.map((q) => (
+								{complianceQuiz?.map((q) => (
 									<FormField
 										key={q.key}
 										control={form.control}
-										name={`compliance.${q.key}`}
+										name={`compliance.${q.key}` as any}
 										render={({ field }) => (
 											<FormItem className="flex items-center justify-between rounded-md p-3">
 												<div>
@@ -115,7 +212,7 @@ const Inspection = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 												</div>
 												<FormControl>
 													<Switch
-														checked={field.value}
+														checked={field.value ?? false}
 														onCheckedChange={field.onChange}
 													/>
 												</FormControl>
@@ -144,7 +241,7 @@ const Inspection = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 
 							<ShadFormField
 								label="notes"
-								name="findings"
+								name="notes"
 								type="textarea"
 								placeholder="Add inspection notes, observations or recommendations..."
 							/>
@@ -161,14 +258,24 @@ const Inspection = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 							<Button
 								type="submit"
 								variant={"secondary"}
+								onClick={form.handleSubmit(handleSaveDraft)}
 							>
 								Save Draft
 							</Button>
 							<Button
 								type="submit"
 								className="bg-green-500 text-white"
+								disabled={isCreatingInspection || isUpdating}
+								// onClick={form.handleSubmit(onSubmit)}
 							>
-								Submit Inspection
+								{(isCreatingInspection || isUpdating) && <Loading />}
+								{isEditing
+									? isUpdating
+										? "Saving..."
+										: "Save Changes"
+									: isCreatingInspection
+										? "Submitting..."
+										: "Submit Inspection"}
 							</Button>
 						</DialogFooter>
 					</form>
@@ -178,4 +285,4 @@ const Inspection = ({ isOpen, setIsOpen }: AddEntityModalProps) => {
 	);
 };
 
-export default Inspection;
+export default AddInspection;

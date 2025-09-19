@@ -15,9 +15,9 @@ import type { AddEntityModalProps, Farm, FarmersResponse } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Loading from "@/components/shared/Loading";
-import { useAddFarmMutation, useUpdateFarmMutation } from "@/hooks/use-farms";
+import { useAddFarmMutation, useUpdateFarmMutation } from "@/hooks/useFarms";
 import { toast } from "sonner";
-import { useGetFarmers } from "@/hooks/use-farmers";
+import { useGetFarmers } from "@/hooks/useFarmers";
 
 const AddFarm = ({
 	isOpen,
