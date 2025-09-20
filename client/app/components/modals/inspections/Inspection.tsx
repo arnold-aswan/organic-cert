@@ -19,7 +19,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
-import { useFarmOptions } from "@/hooks/useGetNamesById";
+import { useAgronomistOptions, useFarmOptions } from "@/hooks/useGetNamesById";
 import {
 	useCreateInspectionMutation,
 	useGetComplianceQuestions,
@@ -54,6 +54,10 @@ const AddInspection = ({
 		isPending: boolean;
 	};
 	const { farms, isLoading } = useFarmOptions(1, 10);
+	const { agronomists, isLoading: loadingAgronomists } = useAgronomistOptions(
+		1,
+		20
+	);
 
 	const { mutate: createInspection, isPending: isCreatingInspection } =
 		useCreateInspectionMutation();
@@ -98,7 +102,6 @@ const AddInspection = ({
 	);
 
 	const handleSaveDraft = (values: InspectionSchema) => {
-		// console.log("values", values);
 		const isoDate = new Date(values.inspectionDate).toISOString();
 		const payload = {
 			...values,
@@ -144,8 +147,6 @@ const AddInspection = ({
 			inspectionDate: isoDate,
 			status: "Submitted" as const,
 		};
-
-		// console.log("payload submit", payload);
 
 		if (isEditing && data?._id) {
 			updateInspection(
@@ -213,11 +214,13 @@ const AddInspection = ({
 							/>
 						</div>
 
-						<div className="space-y-4">
+						<div className="space-y-4 w-full">
 							<ShadFormField
 								label="inspector"
 								name="inspectorName"
-								type="text"
+								type="select"
+								placeholder="select inspector"
+								options={agronomists}
 							/>
 
 							<div className="bg-gray-100 p-2 rounded-md">

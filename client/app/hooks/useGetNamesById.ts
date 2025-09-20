@@ -1,6 +1,11 @@
-import type { FarmersResponse, FarmsResponse } from "@/types/types";
+import type {
+	AgronomistsResponse,
+	FarmersResponse,
+	FarmsResponse,
+} from "@/types/types";
 import { useGetFarmers } from "./useFarmers";
 import { useGetFarms } from "./useFarms";
+import { useGetAgronomists } from "./useAgronomists";
 
 export const useFarmerOptions = (page = 1, limit = 20) => {
 	const { data, isPending } = useGetFarmers(page, limit) as {
@@ -30,4 +35,19 @@ export const useFarmOptions = (page = 1, limit = 20) => {
 		})) || [];
 
 	return { farms, isLoading: isPending };
+};
+
+export const useAgronomistOptions = (page = 1, limit = 20) => {
+	const { data, isPending } = useGetAgronomists(page, limit) as {
+		data: AgronomistsResponse;
+		isPending: boolean;
+	};
+
+	const agronomists =
+		data?.agronomists?.map((agronomist) => ({
+			label: agronomist.fullname,
+			value: agronomist.fullname,
+		})) || [];
+
+	return { agronomists, isLoading: isPending };
 };

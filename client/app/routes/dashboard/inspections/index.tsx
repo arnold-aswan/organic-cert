@@ -67,8 +67,6 @@ const Inspections = () => {
 		setSelectedInspection(selected);
 	};
 
-	// console.log(inspectionsData);
-
 	if (isPending) return <div>Loading...</div>;
 
 	return (
