@@ -170,3 +170,30 @@ export const inspectionsTableHeads: TableHeads[] = [
 		value: "actions",
 	},
 ];
+
+export const certificatesTableHeads: TableHeads[] = [
+	{
+		value: "certificateNo ",
+	},
+	{
+		value: "farm name",
+	},
+	{
+		value: "farmer",
+	},
+	{
+		value: "issue date",
+	},
+	{
+		value: "expiry date",
+	},
+	{
+		value: "compliance score",
+	},
+	{
+		value: "status",
+	},
+	{
+		value: "actions",
+	},
+];

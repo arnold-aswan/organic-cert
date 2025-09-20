@@ -30,7 +30,7 @@ import {
 	buildDefaultCompliance,
 	calculateComplianceScore,
 	complianceColor,
-	denormalizeCompliance,
+	formatISODate,
 	normalizeCompliance,
 } from "@/lib/utils";
 import type {
@@ -41,6 +41,7 @@ import type {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 const AddInspection = ({
 	isOpen,
@@ -62,47 +63,31 @@ const AddInspection = ({
 	const form = useForm<InspectionSchema>({
 		resolver: zodResolver(inspectionSchema),
 		defaultValues: {
-			farmId: data?.farmId?.farmId ?? "",
-			inspectionDate: data?.inspectionDate ?? "",
-			inspectorName: data?.inspectorName ?? "",
-			notes: data?.notes ?? "",
-			status:
-				data?.status === "Draft" ||
-				data?.status === "Submitted" ||
-				data?.status === "Approved" ||
-				data?.status === "Rejected"
-					? data.status
-					: "Draft",
+			farmId: "",
+			inspectionDate: "",
+			inspectorName: "",
+			notes: "",
+			status: "Draft",
 			compliance: {},
 			// data?.compliance ?? buildDefaultCompliance(complianceQuiz || []),
 		},
 	});
 
-	// useEffect(() => {
-	// 	if (complianceQuiz && !isPending) {
-	// 		form.reset({
-	// 			...form.getValues(),
-	// 			compliance:
-	// 				isEditing && data?.compliance
-	// 					? normalizeCompliance(data.compliance) // editing → use saved data
-	// 					: buildDefaultCompliance(complianceQuiz), // new → all false
-	// 		});
-	// 	}
-	// }, [complianceQuiz, isPending, data, isEditing]);
-
 	useEffect(() => {
 		if (complianceQuiz && !isPending) {
 			form.reset({
 				...form.getValues(),
-				farmId: data?.farmId?.farmId ?? "", // since your backend sends farmId as object
-				inspectionDate: data?.inspectionDate ?? "",
+				farmId: data?.farmId?._id ?? "",
+				inspectionDate: data?.inspectionDate
+					? formatISODate(data.inspectionDate)
+					: "",
 				inspectorName: data?.inspectorName ?? "",
 				notes: data?.notes ?? "",
 				status: data?.status ?? "Draft",
 				compliance:
 					isEditing && data?.compliance
-						? normalizeCompliance(data.compliance) // ✅ normalize backend array
-						: buildDefaultCompliance(complianceQuiz), // ✅ all false for new inspection
+						? normalizeCompliance(data.compliance) // normalize backend array
+						: buildDefaultCompliance(complianceQuiz), // all false for new inspection
 			});
 		}
 	}, [complianceQuiz, isPending, data, isEditing]);
@@ -113,7 +98,7 @@ const AddInspection = ({
 	);
 
 	const handleSaveDraft = (values: InspectionSchema) => {
-		console.log("values", values);
+		// console.log("values", values);
 		const isoDate = new Date(values.inspectionDate).toISOString();
 		const payload = {
 			...values,
@@ -121,9 +106,31 @@ const AddInspection = ({
 			status: "Draft" as const,
 		};
 		if (isEditing && data?._id) {
-			updateInspection({ inspectionId: data._id, inspectionData: payload });
+			updateInspection(
+				{ inspectionId: data._id, inspectionData: payload },
+				{
+					onSuccess: (data: any) => {
+						toast.success(data.message);
+					},
+					onError: (error: any) => {
+						const errorMessage = error.response.data.message;
+						toast.error(errorMessage);
+					},
+				}
+			);
 		} else {
-			createInspection({ inspectionData: payload });
+			createInspection(
+				{ inspectionData: payload },
+				{
+					onSuccess: (data: any) => {
+						toast.success(data.message);
+					},
+					onError: (error: any) => {
+						const errorMessage = error.response.data.message;
+						toast.error(errorMessage);
+					},
+				}
+			);
 		}
 		form.reset();
 		setIsOpen(false);
@@ -138,18 +145,38 @@ const AddInspection = ({
 			status: "Submitted" as const,
 		};
 
-		console.log("payload submit", payload);
+		// console.log("payload submit", payload);
 
 		if (isEditing && data?._id) {
-			updateInspection({ inspectionId: data._id, inspectionData: payload });
+			updateInspection(
+				{ inspectionId: data._id, inspectionData: payload },
+				{
+					onSuccess: (data: any) => {
+						toast.success(data.message);
+					},
+					onError: (error: any) => {
+						const errorMessage = error.response.data.message;
+						toast.error(errorMessage);
+					},
+				}
+			);
 		} else {
-			createInspection({ inspectionData: payload });
+			createInspection(
+				{ inspectionData: payload },
+				{
+					onSuccess: (data: any) => {
+						toast.success(data.message);
+					},
+					onError: (error: any) => {
+						const errorMessage = error.response.data.message;
+						toast.error(errorMessage);
+					},
+				}
+			);
 		}
 		form.reset();
 		setIsOpen(false);
 	};
-
-	console.log(complianceQuiz);
 
 	if (isPending || isLoading) {
 		return <div>Loading compliance questions…</div>;

@@ -1,3 +1,4 @@
+import type { ComplianceQuestions } from "@/types/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -5,31 +6,54 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-type ComplianceAnswers = Record<"q1" | "q2" | "q3" | "q4" | "q5", boolean>;
-
-const expectedAnswers: ComplianceAnswers = {
-	q1: false,
-	q2: true,
-	q3: true,
-	q4: true,
-	q5: true,
+type Compliance = Record<string, boolean>;
+type ComplianceQuestion = {
+	key: string;
+	answer: boolean;
 };
 
 export const calculateComplianceScore = (
-	compliance: ComplianceAnswers
+	compliance: Compliance,
+	quiz: ComplianceQuestion[] = []
 ): number => {
-	const totalQuestions = Object.keys(compliance).length;
+	if (!quiz.length) return 0;
 
-	const correctCount = (
-		Object.keys(compliance) as (keyof ComplianceAnswers)[]
-	).filter((key) => compliance[key] === expectedAnswers[key]).length;
+	let correct = 0;
 
-	const scorePerQuestion = 100 / totalQuestions;
+	quiz.forEach((q) => {
+		if (compliance[q.key] === q.answer) {
+			correct++;
+		}
+	});
 
-	return correctCount * scorePerQuestion;
+	return Math.round((correct / quiz.length) * 100);
 };
 
-export const complianceColor = (score: number) => {
+export function buildDefaultCompliance(questions: ComplianceQuestions[]) {
+	return questions.reduce(
+		(acc, q) => {
+			acc[q.key] = false;
+			return acc;
+		},
+		{} as Record<string, boolean>
+	);
+}
+
+type ComplianceItem = { key: string; value: boolean; _id?: string };
+type Compliance2 = ComplianceItem[];
+
+// Frontend form shape
+type ComplianceForm = Record<string, boolean>;
+// Convert backend array -> form object
+export const normalizeCompliance = (compliance: any) => {
+	return compliance.reduce((acc, item) => {
+		acc[item.key] = item.value;
+		return acc;
+	}, {} as ComplianceForm);
+};
+
+export const complianceColor = (score?: number) => {
+	if (!score) return;
 	if (score >= 80) {
 		return "text-green-600";
 	} else if (score >= 50) {
@@ -45,4 +69,15 @@ export const statusColor = (status: string): string => {
 	} else {
 		return "bg-gray-300 text-black";
 	}
+};
+
+export const certificateStatus = (expiryDate: string): string => {
+	const today = new Date();
+	const expiry = new Date(expiryDate);
+
+	return today > expiry ? "expired" : "active";
+};
+
+export const formatISODate = (isoDate: string): string => {
+	return new Date(isoDate).toISOString().split("T")[0];
 };

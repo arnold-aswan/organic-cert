@@ -15,6 +15,7 @@ import {
 	TableBody,
 	TableCaption,
 	TableCell,
+	TableFooter,
 	TableHead,
 	TableHeader,
 	TableRow,
@@ -32,6 +33,7 @@ import {
 } from "@/hooks/useInspections";
 import { format } from "date-fns";
 import Loading from "@/components/shared/Loading";
+import Pagination from "@/components/shared/Pagination";
 
 const Inspections = () => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -65,7 +67,7 @@ const Inspections = () => {
 		setSelectedInspection(selected);
 	};
 
-	console.log(inspectionsData);
+	// console.log(inspectionsData);
 
 	if (isPending) return <div>Loading...</div>;
 
@@ -182,6 +184,21 @@ const Inspections = () => {
 									</TableRow>
 								))}
 							</TableBody>
+							<TableFooter>
+								<TableRow>
+									<TableCell colSpan={inspectionsTableHeads.length}>
+										<div className="flex justify-center">
+											{inspectionsData?.pagination && (
+												<Pagination
+													currentPage={inspectionsData.pagination.page}
+													totalPages={inspectionsData.pagination.totalPages}
+													onPageChange={(newPage) => setPage(newPage)}
+												/>
+											)}
+										</div>
+									</TableCell>
+								</TableRow>
+							</TableFooter>
 						</Table>
 					</div>
 				</div>
