@@ -21,6 +21,13 @@ export interface AnalyticsCardProps {
 	iconColor?: string;
 }
 
+type Pagination = {
+	page: number;
+	limit: number;
+	totalPages: number;
+	total: number;
+};
+
 export type Farmer = {
 	_id: string;
 	fullname: string;
@@ -34,37 +41,10 @@ export type Farmer = {
 	__v?: number;
 };
 
-type Pagination = {
-	page: number;
-	limit: number;
-	totalPages: number;
-	total: number;
-};
-
-export type FarmersResponse = {
-	pagination: Pagination;
-	farmers: Farmer[];
-};
-
-export type FarmsResponse = {
-	pagination: Pagination;
-	farms: Farm[];
-};
-
-export type FieldsResponse = {
-	pagination: Pagination;
-	fields: Field[];
-};
-
-export type InspectionsResponse = {
-	pagination: Pagination;
-	inspections: Inspection[];
-};
-
 export type Farm = {
 	_id: string;
 	name: string;
-	farmerId: string;
+	farmerId: { _id: string; fullname: string };
 	farmerName: string;
 	fieldCount: number;
 	location: string;
@@ -88,17 +68,9 @@ export type Field = {
 	__v?: number;
 };
 
-export type Compliance = {
-	q1: boolean;
-	q2: boolean;
-	q3: boolean;
-	q4: boolean;
-	q5: boolean;
-};
-
 export type Inspection = {
 	_id: string;
-	farmId: { farmId: string; name: string };
+	farmId: { _id: string; name: string };
 	inspectorName: string;
 	inspectionDate: string;
 	status: "Draft" | "Submitted" | "Approved" | "Rejected";
@@ -110,14 +82,48 @@ export type Inspection = {
 	__v?: number;
 };
 
+export type Certificate = {
+	certificateNo: string;
+	complianceScore: number;
+	expiryDate: string;
+	farmName: string;
+	farmerName: string;
+	issueDate: string;
+	pdfUrl: string;
+	_id: string;
+};
+
+export type FarmersResponse = {
+	pagination: Pagination;
+	farmers: Farmer[];
+};
+
+export type FarmsResponse = {
+	pagination: Pagination;
+	farms: Farm[];
+};
+
+export type FieldsResponse = {
+	pagination: Pagination;
+	fields: Field[];
+};
+
+export type InspectionsResponse = {
+	pagination: Pagination;
+	inspections: Inspection[];
+};
+
+export type CertificatesResponse = {
+	pagination: Pagination;
+	certificates: Certificate[];
+};
+
 export type ComplianceQuestions = {
 	key: string;
 	label: string;
 	description: string;
 	answer: boolean;
 };
-
-export type ComplianceQuestionsResponse = ComplianceQuestions[];
 
 export type InspectionsAnalyticsDataResponse = {
 	totalInspections: number;
@@ -139,3 +145,13 @@ export type FieldsAnalyticsDataResponse = {
 	harvestedFields: number;
 	totalHectares: number;
 };
+
+export type Compliance = {
+	q1: boolean;
+	q2: boolean;
+	q3: boolean;
+	q4: boolean;
+	q5: boolean;
+};
+
+export type ComplianceQuestionsResponse = ComplianceQuestions[];
