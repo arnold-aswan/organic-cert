@@ -102,6 +102,27 @@ export const farmersTableHeads: TableHeads[] = [
 	},
 ];
 
+export const agronomistsTableHeads: TableHeads[] = [
+	{
+		value: "full name",
+	},
+	{
+		value: "email",
+	},
+	{
+		value: "phone",
+	},
+	{
+		value: "county",
+	},
+	{
+		value: "status",
+	},
+	{
+		value: "actions",
+	},
+];
+
 export const farmsTableHeads: TableHeads[] = [
 	{
 		value: "farm name",

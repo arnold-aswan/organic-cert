@@ -39,8 +39,16 @@ const getFarmersSchema = z.object({
 	}),
 });
 
-// FARM SCHEMA
+const updateAgronomistSchema = z.object({
+	body: farmerBodySchema,
+	params: z.object({ agronomistId: z.string() }),
+});
 
+const deleteAgronomistSchema = z.object({
+	params: z.object({ agronomistId: z.string() }),
+});
+
+// FARM SCHEMA
 const farmBodySchema = z.object({
 	name: z
 		.string()
@@ -150,4 +158,6 @@ export {
 	getFieldsSchema,
 	complianceQuestionsSchema,
 	inspectionSchema,
+	updateAgronomistSchema,
+	deleteAgronomistSchema,
 };

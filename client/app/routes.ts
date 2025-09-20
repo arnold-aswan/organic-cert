@@ -14,5 +14,6 @@ export default [
 		route("fields", "routes/dashboard/fields/index.tsx"),
 		route("inspections", "routes/dashboard/inspections/index.tsx"),
 		route("certificates", "routes/dashboard/certifications/index.tsx"),
+		route("agronomists", "routes/dashboard/agronomists/index.tsx"),
 	]),
 ] satisfies RouteConfig;

@@ -93,6 +93,18 @@ export type Certificate = {
 	_id: string;
 };
 
+export type Agronomist = {
+	_id: string;
+	fullname: string;
+	email: string;
+	phone: string;
+	county: string;
+	status: string;
+	createdAt?: string;
+	updatedAt?: string;
+	__v?: number;
+};
+
 export type FarmersResponse = {
 	pagination: Pagination;
 	farmers: Farmer[];
@@ -116,6 +128,11 @@ export type InspectionsResponse = {
 export type CertificatesResponse = {
 	pagination: Pagination;
 	certificates: Certificate[];
+};
+
+export type AgronomistsResponse = {
+	pagination: Pagination;
+	agronomists: Agronomist[];
 };
 
 export type ComplianceQuestions = {
