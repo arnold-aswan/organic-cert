@@ -4,7 +4,6 @@ import {
 	Dialog,
 	DialogClose,
 	DialogContent,
-	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -29,7 +28,7 @@ const AddFarm = ({
 		resolver: zodResolver(addFarmSchema),
 		defaultValues: {
 			name: data?.name ?? "",
-			farmerId: data?.farmerId ?? "",
+			farmerId: data?.farmerId?._id ?? "",
 			location: data?.location ?? "",
 			area: data?.area ?? 0,
 			status:
