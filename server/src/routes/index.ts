@@ -4,6 +4,7 @@ import farmRoutes from "./farms.route";
 import fieldRoutes from "./fields.routes";
 import complianceRoutes from "./compliance-questions.routes";
 import inspectionRoutes from "./inspections.routes";
+import certificateRoutes from "./certificates.route";
 
 const router = express.Router();
 
@@ -12,5 +13,6 @@ router.use("/farms", farmRoutes);
 router.use("/fields", fieldRoutes);
 router.use("/compliance-questions", complianceRoutes);
 router.use("/inspections", inspectionRoutes);
+router.use("/certificates", certificateRoutes);
 
 export default router;
