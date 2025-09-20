@@ -1,8 +1,21 @@
 import fs from "fs";
 import path from "path";
 import PDFDocument from "pdfkit";
+import Farm from "../models/farm.model";
 
 const STORAGE_PATH = path.join(__dirname, "../../storage/certificates");
+
+interface CertificateData {
+	farmId: string;
+	inspectorName: string;
+	inspectionDate: Date;
+	complianceScore: number;
+	certificateNo: string;
+	issueDate: Date;
+	expiryDate: Date;
+	farmName?: string;
+	farmerName?: string;
+}
 
 // Ensure storage folder exists
 if (!fs.existsSync(STORAGE_PATH)) {
@@ -10,8 +23,17 @@ if (!fs.existsSync(STORAGE_PATH)) {
 }
 
 // Helper to generate PDF
-const generateCertificatePDF = async (inspection: any) => {
-	const filePath = path.join(STORAGE_PATH, `${inspection._id}.pdf`);
+const generateCertificatePDF = async (data: CertificateData) => {
+	const farm = await Farm.findById(data.farmId).populate(
+		"farmerId",
+		"fullname"
+	);
+
+	if (!farm) {
+		throw new Error("Farm not found");
+	}
+
+	const filePath = path.join(STORAGE_PATH, `${data.certificateNo}.pdf`);
 	const doc = new PDFDocument();
 
 	doc.pipe(fs.createWriteStream(filePath));
@@ -19,18 +41,14 @@ const generateCertificatePDF = async (inspection: any) => {
 	// --- Certificate Content ---
 	doc.fontSize(20).text("Certified Organic Certificate", { align: "center" });
 	doc.moveDown();
-	doc.fontSize(14).text(`Farmer: ${inspection.farmId.farmerName}`);
-	doc.text(`Farm: ${inspection.farmId.name}`);
-	doc.text(`Inspector: ${inspection.inspectorName}`);
-	doc.text(`Inspection Date: ${inspection.inspectionDate}`);
-	doc.text(`Compliance Score: ${inspection.complianceScore}%`);
-	doc.text(`Certificate #: CERT-${inspection._id}`);
-	doc.text(`Issue Date: ${new Date().toDateString()}`);
-	doc.text(
-		`Expiry Date: ${new Date(
-			new Date().setFullYear(new Date().getFullYear() + 1)
-		).toDateString()}`
-	);
+	doc.fontSize(14).text(`Farmer: ${(farm.farmerId as any).fullname}`);
+	doc.text(`Farm: ${farm.name}`);
+	doc.text(`Inspector: ${data.inspectorName}`);
+	doc.text(`Inspection Date: ${data.inspectionDate.toDateString()}`);
+	doc.text(`Compliance Score: ${data.complianceScore}%`);
+	doc.text(`Certificate #: ${data.certificateNo}`);
+	doc.text(`Issue Date: ${data.issueDate.toDateString()}`);
+	doc.text(`Expiry Date: ${data.expiryDate.toDateString()}`);
 	doc.moveDown();
 	doc.text("Certified Organic ✅", { align: "center" });
 	doc.moveDown();
@@ -39,7 +57,7 @@ const generateCertificatePDF = async (inspection: any) => {
 	doc.end();
 
 	// Return relative URL for frontend
-	return `/storage/certificates/${inspection._id}.pdf`;
+	return `/storage/certificates/${data.certificateNo}.pdf`;
 };
 
 export { generateCertificatePDF };
