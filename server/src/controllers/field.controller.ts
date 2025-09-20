@@ -89,7 +89,12 @@ const getFields = async (req: Request, res: Response): Promise<void> => {
 		const skip = (page - 1) * limit;
 
 		const [fields, total] = await Promise.all([
-			await Field.find().skip(skip).limit(limit).populate("farmId", "name"),
+			await Field.find()
+				.skip(skip)
+				.limit(limit)
+				.populate("farmId", "name")
+				.sort({ createdAt: -1 }),
+
 			Field.countDocuments(),
 		]);
 

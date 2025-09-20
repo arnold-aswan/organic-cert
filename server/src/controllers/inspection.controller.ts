@@ -36,9 +36,9 @@ const createInspection = async (req: Request, res: Response): Promise<void> => {
 			expiryDate.setFullYear(issueDate.getFullYear() + 1);
 
 			const pdfPath = await generateCertificatePDF({
-				farmId,
+				farmId: farmId.toString(),
 				inspectorName,
-				inspectionDate,
+				inspectionDate: new Date(inspectionDate),
 				complianceScore,
 				certificateNo,
 				issueDate,
@@ -110,7 +110,7 @@ const updateInspection = async (req: Request, res: Response): Promise<void> => {
 			expiryDate.setFullYear(issueDate.getFullYear() + 1);
 
 			const pdfPath = await generateCertificatePDF({
-				farmId: updatedInspection!.farmId,
+				farmId: updatedInspection!.farmId.toString(),
 				inspectorName: updatedInspection!.inspectorName,
 				inspectionDate: updatedInspection!.inspectionDate,
 				complianceScore: updatedInspection!.complianceScore,
@@ -149,7 +149,11 @@ const getInspections = async (req: Request, res: Response): Promise<void> => {
 		const skip = (page - 1) * limit;
 
 		const [inspections, total] = await Promise.all([
-			Inspection.find().skip(skip).limit(limit).populate("farmId", "name"),
+			Inspection.find()
+				.skip(skip)
+				.limit(limit)
+				.populate("farmId", "name")
+				.sort({ createdAt: -1 }),
 			Inspection.countDocuments(),
 		]);
 

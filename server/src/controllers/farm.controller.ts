@@ -104,6 +104,7 @@ const getFarms = async (req: Request, res: Response): Promise<void> => {
 				.skip(skip)
 				.limit(limit)
 				.populate("farmerId", "fullname")
+				.sort({ createdAt: -1 })
 				.lean(),
 			Farm.countDocuments(),
 		]);
@@ -124,7 +125,7 @@ const getFarms = async (req: Request, res: Response): Promise<void> => {
 
 		const farmsData = farms.map((farm) => ({
 			...farm,
-			farmerId: farm._id,
+			farmerId: farm.farmerId,
 			farmerName: (farm.farmerId as any)?.fullname ?? null,
 			fieldCount: countsMap[farm._id.toString()] ?? 0,
 		}));

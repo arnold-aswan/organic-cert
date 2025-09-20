@@ -114,7 +114,11 @@ const getFarmers = async (req: Request, res: Response) => {
 		const skip = (page - 1) * limit;
 
 		const [farmers, total] = await Promise.all([
-			await Farmer.find().skip(skip).limit(limit).lean(),
+			await Farmer.find()
+				.skip(skip)
+				.limit(limit)
+				.sort({ createdAt: -1 })
+				.lean(),
 			Farmer.countDocuments(),
 		]);
 
