@@ -20,9 +20,12 @@ import type { CertificatesResponse } from "@/types/types";
 import { certificateStatus, cn, complianceColor } from "@/lib/utils";
 import Pagination from "@/components/shared/Pagination";
 import { format } from "date-fns";
+import { downloadFile } from "@/lib/axios-utils";
+import { toast } from "sonner";
 
 const Certifications = () => {
 	const [page, setPage] = useState(1);
+	const [isDownloading, setIsDownloading] = useState(false);
 	const limit = 10;
 
 	const { data: certificatesData, isPending } = useGetCertificates(
@@ -33,10 +36,24 @@ const Certifications = () => {
 		isPending: boolean;
 	};
 
-	// const { mutate: downloadCertificate, isPending: isDownloading } =
-	// 	useDownloadCertificate();
+	const handleDownloadCertificate = async (
+		certificateId: string,
+		certificateNo: string
+	) => {
+		try {
+			setIsDownloading(true);
+			await downloadFile(
+				`/certificates/${certificateId}/download`,
+				`${certificateNo}.pdf`
+			);
+			toast.success("Certificate downloaded successfully");
+		} catch (error) {
+			toast.error("Error downloading certificate");
+		} finally {
+			setIsDownloading(false);
+		}
+	};
 
-	console.log(certificatesData);
 	if (isPending) return <div>Loading...</div>;
 	return (
 		<section className="space-y-6">
@@ -91,8 +108,13 @@ const Certifications = () => {
 											<Button
 												size="sm"
 												className="bg-transparent text-black modal-close-btn"
-												// onClick={() => downloadCertificate(data._id)}
-												// disabled={isDownloading}
+												onClick={() =>
+													handleDownloadCertificate(
+														data._id,
+														data.certificateNo
+													)
+												}
+												disabled={isDownloading}
 											>
 												<Download />
 											</Button>

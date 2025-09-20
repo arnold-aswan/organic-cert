@@ -33,4 +33,23 @@ const fetchData = async <T>(url: string): Promise<T> => {
 	return response.data;
 };
 
-export { postData, fetchData, updateData, deleteData };
+const downloadFile = async (url: string, filename: string): Promise<void> => {
+	const response = await api.get(url, {
+		responseType: "blob", // Important: Set response type to blob for file downloads
+	});
+
+	// Create blob link to download
+	const blob = new Blob([response.data], { type: "application/pdf" });
+	const link = document.createElement("a");
+	const objectUrl = URL.createObjectURL(blob);
+
+	link.href = objectUrl;
+	link.download = filename;
+	document.body.appendChild(link);
+	link.click();
+
+	// Clean up
+	document.body.removeChild(link);
+	URL.revokeObjectURL(objectUrl);
+};
+export { postData, fetchData, updateData, deleteData, downloadFile };

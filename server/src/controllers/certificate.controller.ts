@@ -98,20 +98,45 @@ const downloadCertificate = async (
 			return;
 		}
 
-		const filePath = path.resolve(certificate.pdfUrl);
-		if (!fs.existsSync) {
+		// certificate.pdfUrl is a relative path like '/storage/certificates/CERT-123.pdf'
+		// construct the full path
+		const fileName = path.basename(certificate.pdfUrl);
+		const filePath = path.join(
+			__dirname,
+			"../../storage/certificates",
+			fileName
+		);
+
+		// Check if file exists
+		if (!fs.existsSync(filePath)) {
 			res.status(404).json({ message: "PDF file not found" });
 			return;
 		}
 
-		res.download(filePath, `${certificate.certificateNo}.pdf`);
-		return;
+		// Set proper headers for file download
+		res.setHeader("Content-Type", "application/pdf");
+		res.setHeader(
+			"Content-Disposition",
+			`attachment; filename="${certificate.certificateNo}.pdf"`
+		);
+
+		// Send the file
+		res.download(filePath, `${certificate.certificateNo}.pdf`, (err) => {
+			if (err) {
+				console.error("Error downloading file:", err);
+				if (!res.headersSent) {
+					res.status(500).json({ message: "Error downloading file" });
+				}
+			}
+		});
 	} catch (error) {
 		console.error("Error downloading certificate:", error);
-		res.status(500).json({
-			message: "Internal server error",
-		});
-		return;
+		if (!res.headersSent) {
+			res.status(500).json({
+				message: "Internal server error",
+			});
+		}
 	}
 };
+
 export { getCertificates, downloadCertificate };
