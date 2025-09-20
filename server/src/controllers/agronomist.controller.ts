@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import Farmer from "../models/farmer.model";
 import Agronomist from "../models/agronomist.model";
 
 const addAgronomist = async (req: Request, res: Response): Promise<void> => {
@@ -85,7 +84,7 @@ const deleteAgronomist = async (req: Request, res: Response) => {
 		}
 
 		res.status(200).json({
-			message: "agronomist, their farms and fields deleted successfully.",
+			message: "agronomist deleted successfully.",
 		});
 		return;
 	} catch (error) {
@@ -100,7 +99,7 @@ const deleteAgronomist = async (req: Request, res: Response) => {
 const getAgronomists = async (req: Request, res: Response) => {
 	try {
 		const page = Number(req.query.page as string) || 1;
-		const limit = 10;
+		const limit = Number(req.query.limit as string) || 10;
 		const skip = (page - 1) * limit;
 
 		const [agronomists, total] = await Promise.all([
@@ -109,7 +108,7 @@ const getAgronomists = async (req: Request, res: Response) => {
 				.limit(limit)
 				.sort({ createdAt: -1 })
 				.lean(),
-			Farmer.countDocuments(),
+			Agronomist.countDocuments(),
 		]);
 
 		res.status(200).json({
