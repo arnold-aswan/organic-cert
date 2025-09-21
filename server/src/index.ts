@@ -7,6 +7,7 @@ import routes from "./routes/index";
 
 import expressJSDocSwagger from "express-jsdoc-swagger";
 import path from "path";
+import fs from "fs";
 
 dotenv.config();
 
@@ -59,7 +60,16 @@ const options = {
 	],
 };
 
+console.log("Swagger baseDir:", __dirname);
+console.log("Looking for files with pattern:", "./routes/**/*.js");
+
 expressJSDocSwagger(app)(options);
+const routesDir = path.join(__dirname, "routes");
+if (fs.existsSync(routesDir)) {
+	console.log("Routes directory exists, files:", fs.readdirSync(routesDir));
+} else {
+	console.log("Routes directory not found at:", routesDir);
+}
 
 app.get("/health", async (req: Request, res: Response) => {
 	res.status(200).json({ message: "Green light!" });
