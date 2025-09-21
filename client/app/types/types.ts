@@ -163,6 +163,22 @@ export type FieldsAnalyticsDataResponse = {
 	totalHectares: number;
 };
 
+export type DashAnalytics = {
+	totalCertificates: number;
+	totalFarmers: number;
+};
+
+export type DashActivities = {
+	message: string;
+	data: {
+		action: string;
+		createdAt: string;
+		description: string;
+		title: string;
+		_id: string;
+	}[];
+};
+
 export type Compliance = {
 	q1: boolean;
 	q2: boolean;
