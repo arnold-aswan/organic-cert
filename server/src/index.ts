@@ -39,15 +39,23 @@ const options = {
 		description: "API docs with express-jsdoc-swagger + TypeScript",
 	},
 	baseDir: __dirname,
-	filesPattern: "./routes/*.ts",
+	filesPattern: [
+		"./routes/*.ts", // for local dev
+		"./routes/*.js", // for when ts-node compiles directly
+		"../dist/routes/*.js", // for production build
+	],
 	swaggerUIPath: "/api-docs",
 	exposeSwaggerUI: true,
 	exposeApiDocs: true,
 	apiDocsPath: "/api-docs.json",
 	servers: [
 		{
-			url: "https://organic-cert.onrender.com/api-v1",
-			description: "Deployed server",
+			url: "http://localhost:5000",
+			description: "Local development server",
+		},
+		{
+			url: "https://organic-cert.onrender.com",
+			description: "Production server",
 		},
 	],
 };
