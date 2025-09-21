@@ -24,7 +24,7 @@ const SidebarNav = ({ isOpen }: { isOpen: boolean }) => {
 	const navigate = useNavigate();
 
 	const navItems: NavItem[] = [
-		{ label: "Dashboard", to: "/dashboard", icon: ChartColumnIncreasing },
+		{ label: "Dashboard", to: "/", icon: ChartColumnIncreasing },
 		{ label: "Farmers", to: "/farmers", icon: Users },
 		{ label: "Farms", to: "/farms", icon: Trees },
 		{ label: "Fields", to: "/fields", icon: Wheat },
