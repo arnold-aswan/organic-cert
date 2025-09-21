@@ -10,6 +10,7 @@
 		"module": "commonjs",
 		"target": "ES2020",
 		"types": ["node"],
+		"typeRoots": ["./node_modules/@types"],
 		"moduleResolution": "node", // Required for Node.js
 		// For nodejs:
 		// "lib": ["esnext"],
