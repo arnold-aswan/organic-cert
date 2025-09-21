@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Farmer from "../models/farmer.model";
 import Farm from "../models/farm.model";
 import Field from "../models/field.model ";
+import { logActivity } from "../libs/logActivity";
 
 const addFarmer = async (req: Request, res: Response): Promise<void> => {
 	try {
@@ -24,6 +25,14 @@ const addFarmer = async (req: Request, res: Response): Promise<void> => {
 			county,
 			status,
 		});
+
+		await logActivity(
+			"Farmer",
+			"created",
+			String(farmer._id),
+			"new farmer registered",
+			farmer.fullname
+		);
 
 		res
 			.status(201)
@@ -60,6 +69,14 @@ const updateFarmer = async (req: Request, res: Response) => {
 			return;
 		}
 
+		await logActivity(
+			"Farmer",
+			"updated",
+			String(updatedFarmer._id),
+			"farmer info updated",
+			updatedFarmer.fullname
+		);
+
 		res.status(200).json({
 			message: "farmer updated successfully.",
 			data: updatedFarmer,
@@ -94,6 +111,14 @@ const deleteFarmer = async (req: Request, res: Response) => {
 			await Field.deleteMany({ farmId: { $in: farmIds } });
 		}
 
+		await logActivity(
+			"Farmer",
+			"deleted",
+			String(deletedFarmer._id),
+			"farmer and all their farms and fields removed",
+			deletedFarmer.fullname
+		);
+
 		res.status(200).json({
 			message: "farmer, their farms and fields deleted successfully.",
 		});
@@ -110,14 +135,14 @@ const deleteFarmer = async (req: Request, res: Response) => {
 const getFarmers = async (req: Request, res: Response) => {
 	try {
 		const page = Number(req.query.page as string) || 1;
-		const limit = 10;
+		const limit = Number(req.query.limit as string) || 10;
 		const skip = (page - 1) * limit;
 
 		const [farmers, total] = await Promise.all([
 			await Farmer.find()
+				.sort({ createdAt: -1 })
 				.skip(skip)
 				.limit(limit)
-				.sort({ createdAt: -1 })
 				.lean(),
 			Farmer.countDocuments(),
 		]);

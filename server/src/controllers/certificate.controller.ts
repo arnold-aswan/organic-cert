@@ -7,11 +7,12 @@ import Inspection from "../models/inspection.model";
 const getCertificates = async (req: Request, res: Response): Promise<void> => {
 	try {
 		const page = Number(req.query.page as string) || 1;
-		const limit = 10;
+		const limit = Number(req.query.limit as string) || 10;
 		const skip = (page - 1) * limit;
 
 		const [certificates, total] = await Promise.all([
 			Certificate.find()
+				.sort({ createdAt: -1 })
 				.skip(skip)
 				.limit(limit)
 				.populate({
@@ -22,7 +23,6 @@ const getCertificates = async (req: Request, res: Response): Promise<void> => {
 						select: "fullname", // Get farmer name
 					},
 				})
-				.sort({ createdAt: -1 })
 				.lean(),
 			Certificate.countDocuments(),
 		]);

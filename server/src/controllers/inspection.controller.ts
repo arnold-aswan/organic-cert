@@ -6,6 +6,7 @@ import {
 } from "../utils/compliance";
 import Certificate from "../models/certificate.model";
 import { generateCertificatePDF } from "../utils/certificate";
+import { logActivity } from "../libs/logActivity";
 
 const createInspection = async (req: Request, res: Response): Promise<void> => {
 	try {
@@ -53,6 +54,14 @@ const createInspection = async (req: Request, res: Response): Promise<void> => {
 				pdfUrl: pdfPath,
 			});
 		}
+
+		await logActivity(
+			"Inspection",
+			"created",
+			String(inspection._id),
+			"inspection completed",
+			"farm"
+		);
 
 		res
 			.status(201)
@@ -128,6 +137,14 @@ const updateInspection = async (req: Request, res: Response): Promise<void> => {
 			});
 		}
 
+		await logActivity(
+			"Inspection",
+			"updated",
+			String(inspection._id),
+			"inspection completed",
+			"farm"
+		);
+
 		res.status(200).json({
 			message: "Inspection updated successfully",
 			data: updatedInspection,
@@ -145,15 +162,15 @@ const updateInspection = async (req: Request, res: Response): Promise<void> => {
 const getInspections = async (req: Request, res: Response): Promise<void> => {
 	try {
 		const page = Number(req.query.page) || 1;
-		const limit = 10;
+		const limit = Number(req.query.limit as string) || 10;
 		const skip = (page - 1) * limit;
 
 		const [inspections, total] = await Promise.all([
 			Inspection.find()
+				.sort({ createdAt: -1 })
 				.skip(skip)
 				.limit(limit)
-				.populate("farmId", "name")
-				.sort({ createdAt: -1 }),
+				.populate("farmId", "name"),
 			Inspection.countDocuments(),
 		]);
 

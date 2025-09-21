@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Agronomist from "../models/agronomist.model";
+import { logActivity } from "../libs/logActivity";
 
 const addAgronomist = async (req: Request, res: Response): Promise<void> => {
 	try {
@@ -22,6 +23,14 @@ const addAgronomist = async (req: Request, res: Response): Promise<void> => {
 			county,
 			status,
 		});
+
+		await logActivity(
+			"Agronomist",
+			"created",
+			String(agronomist._id),
+			"new agronomist registered",
+			agronomist.fullname
+		);
 
 		res
 			.status(201)
@@ -58,6 +67,14 @@ const updateAgronomist = async (req: Request, res: Response) => {
 			return;
 		}
 
+		await logActivity(
+			"Agronomist",
+			"updated",
+			String(updatedAgronomist._id),
+			"agronomist info updated",
+			updatedAgronomist.fullname
+		);
+
 		res.status(200).json({
 			message: "agronomist updated successfully.",
 			data: updatedAgronomist,
@@ -83,6 +100,14 @@ const deleteAgronomist = async (req: Request, res: Response) => {
 			return;
 		}
 
+		await logActivity(
+			"Agronomist",
+			"deleted",
+			String(deletedAgronomist._id),
+			"new agronomist registered",
+			deletedAgronomist.fullname
+		);
+
 		res.status(200).json({
 			message: "agronomist deleted successfully.",
 		});
@@ -104,9 +129,9 @@ const getAgronomists = async (req: Request, res: Response) => {
 
 		const [agronomists, total] = await Promise.all([
 			await Agronomist.find()
+				.sort({ createdAt: -1 })
 				.skip(skip)
 				.limit(limit)
-				.sort({ createdAt: -1 })
 				.lean(),
 			Agronomist.countDocuments(),
 		]);
