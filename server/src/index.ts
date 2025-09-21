@@ -40,9 +40,8 @@ const options = {
 	},
 	baseDir: __dirname,
 	filesPattern: [
-		"./routes/*.ts", // for local dev
-		"./routes/*.js", // for when ts-node compiles directly
-		"../dist/routes/*.js", // for production build
+		"./routes/**/*.js", // Look for JS files in the same directory structure
+		"./routes/*.js", // Also check direct routes folder
 	],
 	swaggerUIPath: "/api-docs",
 	exposeSwaggerUI: true,
