@@ -46,8 +46,8 @@ const options = {
 	apiDocsPath: "/api-docs.json",
 	servers: [
 		{
-			url: "http://localhost:5000/api-v1",
-			description: "Development server",
+			url: "https://organic-cert.onrender.com/api-v1",
+			description: "Deployed server",
 		},
 	],
 };
