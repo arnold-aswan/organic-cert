@@ -7,7 +7,6 @@ import routes from "./routes/index";
 
 import expressJSDocSwagger from "express-jsdoc-swagger";
 import path from "path";
-import fs from "fs";
 
 dotenv.config();
 
@@ -40,42 +39,29 @@ const options = {
 		description: "API docs with express-jsdoc-swagger + TypeScript",
 	},
 	baseDir: __dirname,
-	filesPattern: [
-		"./routes/**/*.js", // Look for JS files in the same directory structure
-		"./routes/*.js", // Also check direct routes folder
-	],
+	filesPattern: ["./routes/**/*.js", "./routes/*.js"],
 	swaggerUIPath: "/api-docs",
 	exposeSwaggerUI: true,
 	exposeApiDocs: true,
 	apiDocsPath: "/api-docs.json",
 	servers: [
 		{
-			url: "http://localhost:5000",
+			url: "http://localhost:5000/api-v1",
 			description: "Local development server",
 		},
 		{
-			url: "https://organic-cert.onrender.com",
+			url: "https://organic-cert.onrender.com/api-v1",
 			description: "Production server",
 		},
 	],
 };
 
-console.log("Swagger baseDir:", __dirname);
-console.log("Looking for files with pattern:", "./routes/**/*.js");
-
 expressJSDocSwagger(app)(options);
-const routesDir = path.join(__dirname, "routes");
-if (fs.existsSync(routesDir)) {
-	console.log("Routes directory exists, files:", fs.readdirSync(routesDir));
-} else {
-	console.log("Routes directory not found at:", routesDir);
-}
 
 app.get("/health", async (req: Request, res: Response) => {
 	res.status(200).json({ message: "Green light!" });
 });
 
-// http://localhost:5000/api-v1
 app.use("/api-v1", routes);
 
 // ERROR MIDDLEWARE
