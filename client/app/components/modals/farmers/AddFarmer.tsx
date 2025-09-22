@@ -61,7 +61,10 @@ const AddFarmer = ({
 							setIsOpen(false);
 						},
 						onError: (error: any) => {
-							const errorMessage = error.response.data.message;
+							const errorMessage =
+								error?.message ||
+								error?.response?.data?.message ||
+								"Uh Oh, something went wrong. Please try again later";
 							toast.error(errorMessage);
 						},
 					}
@@ -79,7 +82,10 @@ const AddFarmer = ({
 						setIsOpen(false);
 					},
 					onError: (error: any) => {
-						const errorMessage = error.response.data.message;
+						const errorMessage =
+							error?.message ||
+							error?.response?.data?.message ||
+							"Uh Oh, something went wrong. Please try again later";
 						toast.error(errorMessage);
 					},
 				}
@@ -136,7 +142,7 @@ const AddFarmer = ({
 							options={farmerStatus}
 						/>
 
-						<DialogFooter className="flex items-center justify-end gap-4 pt-4">
+						<DialogFooter className="flex flex-row items-center justify-end gap-4 pt-4">
 							<DialogClose asChild>
 								<Button
 									variant={"outline"}

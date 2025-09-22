@@ -116,7 +116,10 @@ const AddInspection = ({
 						toast.success(data.message);
 					},
 					onError: (error: any) => {
-						const errorMessage = error.response.data.message;
+						const errorMessage =
+							error?.message ||
+							error?.response?.data?.message ||
+							"Uh Oh, something went wrong. Please try again later";
 						toast.error(errorMessage);
 					},
 				}
@@ -129,7 +132,10 @@ const AddInspection = ({
 						toast.success(data.message);
 					},
 					onError: (error: any) => {
-						const errorMessage = error.response.data.message;
+						const errorMessage =
+							error?.message ||
+							error?.response?.data?.message ||
+							"Uh Oh, something went wrong. Please try again later";
 						toast.error(errorMessage);
 					},
 				}
@@ -140,7 +146,6 @@ const AddInspection = ({
 	};
 
 	const onSubmit = (values: InspectionSchema) => {
-		console.log("values submit", values);
 		const isoDate = new Date(values.inspectionDate).toISOString();
 		const payload = {
 			...values,
@@ -156,7 +161,10 @@ const AddInspection = ({
 						toast.success(data.message);
 					},
 					onError: (error: any) => {
-						const errorMessage = error.response.data.message;
+						const errorMessage =
+							error?.message ||
+							error?.response?.data?.message ||
+							"Uh Oh, something went wrong. Please try again later";
 						toast.error(errorMessage);
 					},
 				}
@@ -169,7 +177,10 @@ const AddInspection = ({
 						toast.success(data.message);
 					},
 					onError: (error: any) => {
-						const errorMessage = error.response.data.message;
+						const errorMessage =
+							error?.message ||
+							error?.response?.data?.message ||
+							"Uh Oh, something went wrong. Please try again later";
 						toast.error(errorMessage);
 					},
 				}
@@ -188,7 +199,7 @@ const AddInspection = ({
 			open={isOpen}
 			onOpenChange={setIsOpen}
 		>
-			<DialogContent className="sm:max-w-[550px] ">
+			<DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>Add New Inspection</DialogTitle>
 				</DialogHeader>
@@ -276,7 +287,7 @@ const AddInspection = ({
 								placeholder="Add inspection notes, observations or recommendations..."
 							/>
 						</div>
-						<DialogFooter className="flex items-center justify-end gap-4 pt-4">
+						<DialogFooter className="flex flex-row flex-wrap items-center justify-end gap-4 pt-4">
 							<DialogClose asChild>
 								<Button
 									variant={"outline"}
