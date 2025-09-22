@@ -50,7 +50,7 @@ export const useGetFields = (page: number, limit: number) => {
 	return useQuery({
 		queryKey: ["fields", page, limit],
 		queryFn: () => fetchData(`/fields?page=${page}&limit=${limit}`),
-		staleTime: 10 * 6 * 1000,
+		staleTime: 10 * 60 * 1000,
 	});
 };
 
@@ -58,6 +58,6 @@ export const useGetFieldsAnalytics = () => {
 	return useQuery({
 		queryKey: ["fields"],
 		queryFn: () => fetchData("/fields/analytics"),
-		staleTime: 10 * 6 * 1000,
+		staleTime: 10 * 60 * 1000,
 	});
 };

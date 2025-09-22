@@ -48,7 +48,7 @@ export const useGetFarms = (page: number, limit: number) => {
 	return useQuery({
 		queryKey: ["farms", page, limit],
 		queryFn: () => fetchData(`/farms?page=${page}&limit=${limit}`),
-		staleTime: 10 * 6 * 1000,
+		staleTime: 10 * 60 * 1000,
 	});
 };
 
@@ -56,6 +56,6 @@ export const useGetFarmsAnalytics = () => {
 	return useQuery({
 		queryKey: ["farms"],
 		queryFn: () => fetchData("/farms/analytics"),
-		staleTime: 10 * 6 * 1000,
+		staleTime: 10 * 60 * 1000,
 	});
 };

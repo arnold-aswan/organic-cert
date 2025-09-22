@@ -1,5 +1,5 @@
 import { fetchData } from "@/lib/axios-utils";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 export const useGetCertificates = (page: number, limit: number) => {
 	return useQuery({

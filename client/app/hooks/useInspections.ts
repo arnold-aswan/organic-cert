@@ -36,7 +36,7 @@ export const useGetInspections = (page: number, limit: number) => {
 	return useQuery({
 		queryKey: ["inspections", page, limit],
 		queryFn: () => fetchData(`/inspections?page=${page}&limit=${limit}`),
-		staleTime: 10 * 6 * 1000,
+		staleTime: 10 * 60 * 1000,
 	});
 };
 
@@ -44,7 +44,7 @@ export const useGetComplianceQuestions = () => {
 	return useQuery({
 		queryKey: ["compliance"],
 		queryFn: () => fetchData(`/compliance-questions`),
-		staleTime: 10 * 6 * 1000,
+		staleTime: 10 * 60 * 1000,
 	});
 };
 
@@ -52,6 +52,6 @@ export const useGetInspectionsAnalytics = () => {
 	return useQuery({
 		queryKey: ["inspections"],
 		queryFn: () => fetchData("/inspections/analytics"),
-		staleTime: 10 * 6 * 1000,
+		staleTime: 10 * 60 * 1000,
 	});
 };
